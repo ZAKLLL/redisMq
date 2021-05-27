@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 读取配置文件 默认的config.properties 和自定义都支持
- *
  */
 public class Config {
 
@@ -27,10 +26,9 @@ public class Config {
     }
 
     private void initConfig(String configFile) {
-        InputStream is = Config.class.getClassLoader().getResourceAsStream(configFile);
-        try {
+
+        try (InputStream is = Config.class.getClassLoader().getResourceAsStream(configFile);) {
             configuration.load(is);
-            is.close();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -69,7 +67,6 @@ public class Config {
      * 获得配置项。
      *
      * @param key 配置关键字
-     *
      * @return 配置项
      */
     public String getStringValue(String key) {

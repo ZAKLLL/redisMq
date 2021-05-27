@@ -1,6 +1,9 @@
 package com.zakl.config;
 
 import com.zakl.common.Config;
+import com.zakl.container.MqServerContainer;
+import com.zakl.protocol.MqPubMessage;
+import com.zakl.protocol.MqSubMessage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,93 +24,30 @@ public class ServerConfig implements Serializable {
 
 
     /**
-     * 代理服务器绑定主机host
+     * 接收publish 端口
      */
-    private String serverBind;
+    private static final Integer mqPubPort;
 
     /**
-     * 代理服务器与代理客户端通信端口
+     * 接收subscribe端口
      */
-    private Integer serverPort;
-
-    /**
-     * 配置服务绑定主机host
-     */
-    private String configServerBind;
-
-    /**
-     * 配置服务端口
-     */
-    private Integer configServerPort;
+    private static final Integer mqSubPort;
 
 
-    /**
-     * HTTP代理服务 绑定主机host
-     */
-    private String httpServerProxyBind;
+    static {
+        mqPubPort = Config.getInstance().getIntValue("server.mqPubPort");
+        MqServerContainer.regisMsgPort(MqPubMessage.class,mqPubPort);
 
-    /**
-     * HTTP代理服务 端口
-     */
-    private Integer httpServerProxyPort;
-
-    /**
-     * udp ServerBind
-     */
-    private String udpServerBind;
-
-    /**
-     * udp ServerPort
-     */
-    private Integer udpServerPort;
-
-    /**
-     * 配置服务管理员用户名
-     */
-    private String configAdminUsername;
-
-    /**
-     * 配置服务管理员密码
-     */
-    private String configAdminPassword;
-
-
-    private ServerConfig() {
-
-
-        // 代理服务器主机和端口配置初始化
-        this.serverPort = Config.getInstance().getIntValue("server.port");
-        this.serverBind = Config.getInstance().getStringValue("server.bind", "0.0.0.0");
-
-        /**
-         * HTTP代理服务 绑定主机host 端口
-         */
-        this.httpServerProxyPort = Config.getInstance().getIntValue("http.proxy.server.port");
-        this.httpServerProxyBind = Config.getInstance().getStringValue("http.proxy.server.bind", "0.0.0.0");
-
-
-        /**
-         * UDP Server 绑定主机host 端口
-         */
-        this.udpServerPort = Config.getInstance().getIntValue("http.udp.server.port");
-        this.udpServerBind = Config.getInstance().getStringValue("http.udp.server.bind", "0.0.0.0");
-
-
-        // 配置服务器主机和端口配置初始化
-        this.configServerPort = Config.getInstance().getIntValue("config.server.port");
-        this.configServerBind = Config.getInstance().getStringValue("config.server.bind", "0.0.0.0");
-
-        // 配置服务器管理员登录认证信息
-        this.configAdminUsername = Config.getInstance().getStringValue("config.admin.username");
-        this.configAdminPassword = Config.getInstance().getStringValue("config.admin.password");
+        mqSubPort = Config.getInstance().getIntValue("server.mqSubPort");
+        MqServerContainer.regisMsgPort(MqSubMessage.class,mqSubPort);
 
         log.info(
-                "config init serverBind {}, serverPort {}, configServerBind {}, configServerPort {}, configAdminUsername {}, configAdminPassword {}",
-                serverBind, serverPort, configServerBind, configServerPort, configAdminUsername, configAdminPassword);
-
+                "config init mqPubPort {}, mqSubPort {}",
+                mqPubPort, mqSubPort);
     }
 
-    public static ServerConfig getInstance() {
-        return instance;
+    public static void init(){
+        log.info("init ServerConfig");
     }
+
 }

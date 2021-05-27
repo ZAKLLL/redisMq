@@ -1,18 +1,13 @@
 package com.zakl.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- * 类型转换工具类.
- *
- * @author fengfei
- *
- */
+
+@Slf4j
 public class LangUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(LangUtil.class);
 
     public static Boolean parseBoolean(Object value) {
         if (value != null) {
@@ -31,9 +26,9 @@ public class LangUtil {
                 return (Boolean) value;
             } else if (value instanceof String) {
                 try {
-                    return Boolean.valueOf((String) value);
+                    return Boolean.parseBoolean((String) value);
                 } catch (Exception e) {
-                    logger.warn("parse boolean value({}) failed.", value);
+                    log.warn("parse boolean value({}) failed.", value);
                 }
             }
         }
@@ -65,7 +60,7 @@ public class LangUtil {
                 try {
                     return Integer.valueOf((String) value);
                 } catch (Exception e) {
-                    logger.warn("parse Integer value({}) failed.", value);
+                    log.warn("parse Integer value({}) failed.", value);
                 }
             }
         }
@@ -99,7 +94,7 @@ public class LangUtil {
                 try {
                     return Long.valueOf((String) value);
                 } catch (NumberFormatException e) {
-                    logger.warn("parse Long value({}) failed.", value);
+                    log.warn("parse Long value({}) failed.", value);
                 }
             }
         }
@@ -137,7 +132,7 @@ public class LangUtil {
                 try {
                     return Double.valueOf((String) value);
                 } catch (NumberFormatException e) {
-                    logger.warn("parse Double value({}) failed.", value);
+                    log.warn("parse Double value({}) failed.", value);
                 }
             }
         }
