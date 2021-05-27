@@ -1,6 +1,5 @@
 import com.zakl.container.ContainerHelper;
 import com.zakl.container.MqServerContainer;
-import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;

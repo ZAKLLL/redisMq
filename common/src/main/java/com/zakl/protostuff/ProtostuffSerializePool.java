@@ -1,4 +1,4 @@
-package com.zakl.protocol.protostuff;
+package com.zakl.protostuff;
 
 
 import org.apache.commons.pool2.impl.GenericObjectPool;

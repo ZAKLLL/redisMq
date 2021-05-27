@@ -1,4 +1,4 @@
-package com.zakl.protocol.protostuff;
+package com.zakl.protostuff;
 
 
 import com.zakl.protocol.RpcSerialize;

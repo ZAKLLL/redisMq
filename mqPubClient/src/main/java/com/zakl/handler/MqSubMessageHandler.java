@@ -1,4 +1,4 @@
-package com.zakl.handlers;
+package com.zakl.handler;
 
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,7 +12,7 @@ import java.util.Date;
  * @author ZhangJiaKui
  * @classname MqSubMessageHandler
  * @description TODO
- * @date 5/27/2021 3:05 PM
+ * @date 5/27/2021 4:26 PM
  */
 @Slf4j
 public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessage> {
@@ -25,19 +25,10 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelActive");
+
+        MqSubMessage mqSubMessage = new MqSubMessage();
+        mqSubMessage.setMsg("Hello World");
+        ctx.writeAndFlush(mqSubMessage);
         super.channelActive(ctx);
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
-                + "channelInactive");
-        super.channelInactive(ctx);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
     }
 }

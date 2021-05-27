@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +39,7 @@ public class MqPubMessage implements Serializable {
      * mq推送数据
      */
     private Map<String, List<String>> pubMsgs;
+
 
 
 }

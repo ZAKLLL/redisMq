@@ -1,9 +1,6 @@
 package com.zakl.config;
 
 import com.zakl.common.Config;
-import com.zakl.protocol.MqPubMessage;
-import com.zakl.protocol.MqSubMessage;
-import com.zakl.container.MqServerContainer;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,11 +13,18 @@ import java.io.Serializable;
  */
 @Slf4j
 @Data
-public class ServerConfig implements Serializable {
+public class ClientConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ServerConfig instance = new ServerConfig();
+    private ClientConfig() {
+
+    }
+
+    /**
+     * mqServerIp
+     */
+    private static final String serverIp;
 
 
     /**
@@ -36,18 +40,25 @@ public class ServerConfig implements Serializable {
 
     static {
         mqPubPort = Config.getInstance().getIntValue("server.mqPubPort");
-        MqServerContainer.regisMsgPort(MqPubMessage.class,mqPubPort);
 
         mqSubPort = Config.getInstance().getIntValue("server.mqSubPort");
-        MqServerContainer.regisMsgPort(MqSubMessage.class,mqSubPort);
+
+        serverIp = Config.getInstance().getStringValue("server.ip");
 
         log.info(
-                "config init mqPubPort {}, mqSubPort {}",
-                mqPubPort, mqSubPort);
+                "config init serverIp{}, mqPubPort {}, mqSubPort {}",
+                serverIp, mqPubPort, mqSubPort);
     }
 
-    public static void init(){
-        log.info("init ServerConfig");
+    public static String getServerIp() {
+        return serverIp;
     }
 
+    public static Integer getMqPubPort() {
+        return mqPubPort;
+    }
+
+    public static Integer getMqSubPort() {
+        return mqSubPort;
+    }
 }
