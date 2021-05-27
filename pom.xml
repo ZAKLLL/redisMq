@@ -11,7 +11,6 @@
     <modules>
         <module>mqServer</module>
         <module>mqPubClient</module>
-        <module>mqSubClient</module>
         <module>common</module>
     </modules>
 
@@ -25,8 +24,6 @@
         <loback.version>1.2.3</loback.version>
         <lombok.version>1.18.16</lombok.version>
         <moudle.common.version>1.0-SNAPSHOT</moudle.common.version>
-        <moudle.mqPubClient.version>1.0-SNAPSHOT</moudle.mqPubClient.version>
-        <moudle.mqPubClient.version>1.0-SNAPSHOT</moudle.mqPubClient.version>
     </properties>
 
     <dependencies>

@@ -20,10 +20,13 @@ public class MqSubMessage implements Serializable {
     public transient static final byte TYPE_HEARTBEAT = 0x00;
 
     /**
-     * mq订阅信息
+     * mq注册订阅
      */
     public transient static final byte TYPE_SUBSCRIBE = 0x01;
 
+    /**
+     * mq消息传递
+     */
     public transient static final byte TYPE_MQ_MESSAGE = 0x02;
 
     /**
@@ -32,10 +35,29 @@ public class MqSubMessage implements Serializable {
     public transient static final byte TYPE_ACK = 0x03;
 
 
+
     /**
      * 消息类型
      */
     private byte type;
+
+
+    /**
+     * clientId
+     */
+    public String clientId;
+
+    /**
+     * 客户端权重
+     */
+    public Integer clientWeight = -1;
+
+    /**
+     * 是否需要服务器主动推送
+     */
+    public boolean initiativePush = true;
+
+
 
     /**
      * 消息id

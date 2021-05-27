@@ -35,13 +35,18 @@
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-core</artifactId>
-            <version>1.7.4</version>
+            <version>${protostuff.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-runtime</artifactId>
-            <version>1.7.4</version>
+            <version>${protostuff.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
         </dependency>
 
     </dependencies>

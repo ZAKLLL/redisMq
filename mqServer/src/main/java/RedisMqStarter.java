@@ -1,3 +1,4 @@
+import com.zakl.config.RedisConfig;
 import com.zakl.container.ContainerHelper;
 import com.zakl.container.MqServerContainer;
 import com.zakl.protocol.MqPubMessage;
@@ -16,10 +17,6 @@ public class RedisMqStarter {
 
 
     private final static NioEventLoopGroup serverBossGroup = new NioEventLoopGroup();
-
-
-    //初始化redis信息
-
 
 
 
