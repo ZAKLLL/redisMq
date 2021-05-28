@@ -6,11 +6,14 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.ScoredValue;
 import io.lettuce.core.ZAddArgs;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 import io.lettuce.core.support.ConnectionPoolSupport;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
+import java.io.InputStream;
 
 @Slf4j
 public class RedisUtil {
@@ -67,6 +70,23 @@ public class RedisUtil {
         returnConnection(connection);
 
         return zMaxValue;
+    }
+
+    public static void syncQueueAdd(String key, String... members) {
+        StatefulRedisConnection<String, String> connection = getConnection();
+
+        connection.sync().lpush(key, members);
+
+        returnConnection(connection);
+    }
+
+    public static String syncQueueRpop(String key) {
+        StatefulRedisConnection<String, String> connection = getConnection();
+
+        String rpop = connection.sync().rpop(key);
+
+        returnConnection(connection);
+        return rpop;
     }
 
 

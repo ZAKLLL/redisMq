@@ -1,13 +1,7 @@
 package com.zakl.config;
 
-import com.zakl.common.Config;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.support.*;
-import lombok.SneakyThrows;
+import com.zakl.util.ConfigUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 /**
  * @author ZhangJiaKui
@@ -43,10 +37,10 @@ public class RedisConfig {
 
 
     static {
-        host = Config.getInstance().getStringValue("redis.host");
-        port = Config.getInstance().getIntValue("redis.port");
-        pwd = Config.getInstance().getStringValue("redis.pwd");
-        db = Config.getInstance().getIntValue("redis.db");
+        host = ConfigUtil.getInstance().getStringValue("redis.host");
+        port = ConfigUtil.getInstance().getIntValue("redis.port");
+        pwd = ConfigUtil.getInstance().getStringValue("redis.pwd");
+        db = ConfigUtil.getInstance().getIntValue("redis.db");
 
         log.info(
                 "config init redisServer info host {}, port {}, pwd {} ,db{}",

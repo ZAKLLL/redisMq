@@ -1,5 +1,6 @@
 package com.zakl.protocol;
 
+import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,8 +39,7 @@ public class MqPubMessage implements Serializable {
     /**
      * mq推送数据
      */
-    private Map<String, List<String>> pubMsgs;
-
+    private Map<String, List<Pair<Double, String>>> pubMsgs;
 
 
 }

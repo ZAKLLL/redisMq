@@ -1,4 +1,4 @@
-package com.zakl.common;
+package com.zakl.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,25 +9,25 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 读取配置文件 默认的config.properties 和自定义都支持
  */
-public class Config {
+public class ConfigUtil {
 
     private static final String DEFAULT_CONF = "config.properties";
 
-    private static final Map<String, Config> instances = new ConcurrentHashMap<>();
+    private static final Map<String, ConfigUtil> instances = new ConcurrentHashMap<>();
 
     private Properties configuration = new Properties();
 
-    private Config() {
+    private ConfigUtil() {
         initConfig(DEFAULT_CONF);
     }
 
-    private Config(String configFile) {
+    private ConfigUtil(String configFile) {
         initConfig(configFile);
     }
 
     private void initConfig(String configFile) {
 
-        try (InputStream is = Config.class.getClassLoader().getResourceAsStream(configFile);) {
+        try (InputStream is = ConfigUtil.class.getClassLoader().getResourceAsStream(configFile);) {
             configuration.load(is);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -39,7 +39,7 @@ public class Config {
      *
      * @return Configuration实例
      */
-    public static Config getInstance() {
+    public static ConfigUtil getInstance() {
         return getInstance(DEFAULT_CONF);
     }
 
@@ -49,18 +49,18 @@ public class Config {
      * @param configFile
      * @return
      */
-    public static Config getInstance(String configFile) {
-        Config config = instances.get(configFile);
-        if (config == null) {
+    public static ConfigUtil getInstance(String configFile) {
+        ConfigUtil configUtil = instances.get(configFile);
+        if (configUtil == null) {
             synchronized (instances) {
-                config = instances.get(configFile);
-                if (config == null) {
-                    config = new Config(configFile);
-                    instances.put(configFile, config);
+                configUtil = instances.get(configFile);
+                if (configUtil == null) {
+                    configUtil = new ConfigUtil(configFile);
+                    instances.put(configFile, configUtil);
                 }
             }
         }
-        return config;
+        return configUtil;
     }
 
     /**

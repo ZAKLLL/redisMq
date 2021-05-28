@@ -1,6 +1,6 @@
 package com.zakl.config;
 
-import com.zakl.common.Config;
+import com.zakl.util.ConfigUtil;
 import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.container.MqServerContainer;
@@ -35,10 +35,10 @@ public class ServerConfig implements Serializable {
 
 
     static {
-        mqPubPort = Config.getInstance().getIntValue("server.mqPubPort");
+        mqPubPort = ConfigUtil.getInstance().getIntValue("server.mqPubPort");
         MqServerContainer.regisMsgPort(MqPubMessage.class,mqPubPort);
 
-        mqSubPort = Config.getInstance().getIntValue("server.mqSubPort");
+        mqSubPort = ConfigUtil.getInstance().getIntValue("server.mqSubPort");
         MqServerContainer.regisMsgPort(MqSubMessage.class,mqSubPort);
 
         log.info(

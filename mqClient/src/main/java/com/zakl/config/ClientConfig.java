@@ -1,6 +1,6 @@
 package com.zakl.config;
 
-import com.zakl.common.Config;
+import com.zakl.util.ConfigUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,11 +39,11 @@ public class ClientConfig implements Serializable {
 
 
     static {
-        mqPubPort = Config.getInstance().getIntValue("server.mqPubPort");
+        mqPubPort = ConfigUtil.getInstance().getIntValue("server.mqPubPort");
 
-        mqSubPort = Config.getInstance().getIntValue("server.mqSubPort");
+        mqSubPort = ConfigUtil.getInstance().getIntValue("server.mqSubPort");
 
-        serverIp = Config.getInstance().getStringValue("server.ip");
+        serverIp = ConfigUtil.getInstance().getStringValue("server.ip");
 
         log.info(
                 "config init serverIp{}, mqPubPort {}, mqSubPort {}",

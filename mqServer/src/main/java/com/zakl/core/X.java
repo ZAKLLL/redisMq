@@ -2,7 +2,6 @@ package com.zakl.core;
 
 
 import cn.hutool.core.lang.Pair;
-import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AllArgsConstructor;
@@ -10,6 +9,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -48,6 +48,16 @@ public class X {
      */
     private final static Set<String> passiveClients = new CopyOnWriteArraySet<>();
 
+    /**
+     * 优先级队列
+     */
+    private final static Set<String> priorityKeys = new HashSet<>();
+
+    /**
+     * 先进先出队列
+     */
+    private final static Set<String> fifoKeys = new HashSet<>();
+
 
     public static void registerSubClient(ChannelHandlerContext ctx, MqSubMessage msg) {
         for (final String sortedSetChannelName : msg.getChannels()) {
@@ -69,15 +79,15 @@ public class X {
                 AtomicBoolean clientAlive = new AtomicBoolean(true);
 
                 clientAliveMap.put(sortedSetChannelName, clientAlive);
+
+
                 //只监听
                 executors.submit(new Runnable() {
                     @Override
                     public void run() {
                         while (true) {
                             while (clientAlive.get()) {
-                                //todo 监听当前channel 的缓冲和 具体的RedisServer中sortedSet
-                                MqPubMessage listen = PubMessageBufHandler.listen(sortedSetChannelName);
-                                DistributeMsgHandler.distributePubMsg(listen);
+                                handleRcvAndDistribute(sortedSetChannelName);
                             }
                             try {
                                 condition.await();
@@ -92,6 +102,14 @@ public class X {
     }
 
 
+    public static void handleRcvAndDistribute(String keyName) {
+        PubMsgBufHandle msgBufHandler = fifoKeys.contains(keyName) ? PriorityPubMsgBufBufHandler.getInstance() : FifoPubMsgBufBufHandler.getInstance();
+
+//      MqPubMessage listen = PubMessageBufHandler.listen(sortedSetChannelName);
+//                                DistributeMsgHandler.distributePubMsg(listen);
+
+    }
+
     /**
      * 注册一个新的队列到Redis
      *
@@ -99,7 +117,7 @@ public class X {
      */
     public static void registerNewSortedSet(String channelName) {
 
-        PubMessageBufHandler.registerNewSortedSetBuf(channelName);
+        PriorityPubMsgBufBufHandler.registerNewSortedSetBuf(channelName);
         RedisUtil.syncSortedSetAdd(channelName, new Pair<>(MIN_SCORE, KEY_HOLDER + channelName));
     }
 
