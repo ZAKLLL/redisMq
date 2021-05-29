@@ -1,6 +1,8 @@
 package com.zakl.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author ZhangJiaKui
@@ -9,6 +11,8 @@ import lombok.Data;
  * @date 5/28/2021 10:00 AM
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MqMessage {
     /**
      * 消息id uuid唯一

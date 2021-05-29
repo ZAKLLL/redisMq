@@ -1,11 +1,17 @@
-package com.zakl.core;
+package com.zakl.mqhandler;
 
 import com.zakl.dto.MqMessage;
 
 public class FifoPubMsgBufBufHandler implements PubMsgBufHandle {
 
+    private final static FifoPubMsgBufBufHandler instance = new FifoPubMsgBufBufHandler();
+
+    private FifoPubMsgBufBufHandler() {
+
+    }
+
     public static PubMsgBufHandle getInstance() {
-        return null;
+        return instance;
     }
 
     @Override

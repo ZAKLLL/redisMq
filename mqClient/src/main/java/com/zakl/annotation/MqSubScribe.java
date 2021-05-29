@@ -10,10 +10,20 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface MqSubScribe {
 
+
+    enum KeyTypeEnum {
+        LISTS,
+        SORTEDSET
+    }
+
     /**
      * 订阅的keys
      */
-     String[] keys() ;
+    String[] keys();
+
+
+    KeyTypeEnum keyType() default KeyTypeEnum.SORTEDSET;
+
 
     /**
      * 期望单次推送收到的消息数(当消息不足expectCnt的时候,返回最大消息数)
@@ -30,8 +40,5 @@ public @interface MqSubScribe {
      */
     boolean activePush() default true;
 
-    /**
-     *
-     */
 
 }

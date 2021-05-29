@@ -1,4 +1,4 @@
-package com.zakl.handler;
+package com.zakl.nettyhandler;
 
 import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqPubMessage;

@@ -1,4 +1,4 @@
-package com.zakl.handler;
+package com.zakl.nettyhandler;
 
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,7 +27,7 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
                 + "channelActive");
 
         MqSubMessage mqSubMessage = new MqSubMessage();
-        mqSubMessage.setMsg("this is MqPubClient");
+//        mqSubMessage.setMsg("this is MqPubClient");
         ctx.writeAndFlush(mqSubMessage);
         super.channelActive(ctx);
     }

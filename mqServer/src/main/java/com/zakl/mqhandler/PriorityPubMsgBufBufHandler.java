@@ -1,14 +1,12 @@
-package com.zakl.core;
+package com.zakl.mqhandler;
 
-import cn.hutool.core.lang.Pair;
-import cn.hutool.core.lang.UUID;
 import com.zakl.dto.MqMessage;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import static com.zakl.constant.Contains.PUB_BUFFER_MAX_LIMIT;
+import static com.zakl.constant.Constants.PUB_BUFFER_MAX_LIMIT;
 
 public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
 
@@ -36,7 +34,8 @@ public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
         if (!sortedSetBufMap.containsKey(keyName)) {
             throw new RuntimeException("当前Channel不存在");
         }
-        return sortedSetBufMap.get(keyName).pollFirst();
+        LinkedBlockingDeque<MqMessage> mqMessages = sortedSetBufMap.get(keyName);
+        return mqMessages.isEmpty() ? null : mqMessages.pollFirst();
     }
 
     public void add(String keyName, MqMessage mqMessage, boolean tail) {
@@ -45,18 +44,15 @@ public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
         }
         LinkedBlockingDeque<MqMessage> msgBuffers = sortedSetBufMap.get(keyName);
         if (msgBuffers.size() > PUB_BUFFER_MAX_LIMIT) {
-            //直接推送数据到Redis
-            String uuid = UUID.fastUUID().toString();
-            String redisData = String.format("uuid:%s\n%s", uuid, mqMessage.getMessage());
-            RedisUtil.syncSortedSetAdd(keyName, new Pair<>(mqMessage.getWeight(), redisData));
+            RedisUtil.syncSortedSetAdd(mqMessage);
         }
         if (tail) {
             msgBuffers.addLast(mqMessage);
         } else {
             msgBuffers.addFirst(mqMessage);
         }
-
     }
+
 
 
 }

@@ -38,6 +38,11 @@ public class MqPubMessage implements Serializable {
 
     /**
      * mq推送数据
+     * key->mq_key
+     * value->{
+     * value.key->score (-1 表示当前数据分发到 MQ_LIST:key)
+     * value.key->score (>=0 表示当前数据分发到 MQ_SORTED_SET:key)
+     * }
      */
     private Map<String, List<Pair<Double, String>>> pubMessages;
 

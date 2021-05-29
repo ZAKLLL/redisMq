@@ -1,4 +1,4 @@
-package com.zakl.core;
+package com.zakl.mqhandler;
 
 import com.zakl.dto.MqMessage;
 

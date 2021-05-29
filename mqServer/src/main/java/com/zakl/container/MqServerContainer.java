@@ -1,7 +1,7 @@
 package com.zakl.container;
 
 import com.zakl.config.ServerConfig;
-import com.zakl.handler.SimpleHandlerHelper;
+import com.zakl.nettyhandler.SimpleHandlerHelper;
 import com.zakl.protostuff.ProtostuffCodecUtil;
 import com.zakl.protostuff.ProtostuffDecoder;
 import com.zakl.protostuff.ProtostuffEncoder;

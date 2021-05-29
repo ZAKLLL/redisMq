@@ -1,4 +1,4 @@
-package com.zakl.core;
+package com.zakl.mqhandler;
 
 import com.zakl.dto.MqMessage;
 
@@ -10,7 +10,5 @@ import com.zakl.dto.MqMessage;
  */
 public interface MqMsgDistributeHandle {
 
-    MqMsgDistributeHandle getInstance();
-
-    void distribute(MqMessage mqMessage);
+    void distribute(MqMessage mqMessage, String keyName);
 }

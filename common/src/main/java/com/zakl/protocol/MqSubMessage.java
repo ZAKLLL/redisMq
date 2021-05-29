@@ -64,6 +64,12 @@ public class MqSubMessage implements Serializable {
      */
     private String messageId;
 
+
+    /**
+     * key 将会为 自动转换为 MQ_LIST:key or MQ_SORTED_SET:key
+     * 取决于@Subscribe 中的注解 配置keyType
+     */
+
     /**
      * 订阅的通道(服务端主动推送)
      * only user for first register , null value when other time;
