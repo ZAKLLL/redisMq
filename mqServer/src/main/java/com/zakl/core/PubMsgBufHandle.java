@@ -1,9 +1,6 @@
 package com.zakl.core;
 
-import com.zakl.protocol.MqMessage;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.zakl.dto.MqMessage;
 
 /**
  * @author ZhangJiaKui

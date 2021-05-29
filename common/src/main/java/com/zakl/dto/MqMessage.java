@@ -1,4 +1,4 @@
-package com.zakl.protocol;
+package com.zakl.dto;
 
 import lombok.Data;
 
@@ -21,10 +21,10 @@ public class MqMessage {
     private Double weight;
 
 
-//    /**
-//     * channel name
-//     */
-//    private String key;
+    /**
+     * channel name
+     */
+    private String key;
 
     /**
      * 消息内容

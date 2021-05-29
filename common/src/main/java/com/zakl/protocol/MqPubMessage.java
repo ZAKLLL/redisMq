@@ -1,6 +1,6 @@
 package com.zakl.protocol;
 
-import javafx.util.Pair;
+import cn.hutool.core.lang.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,7 +39,7 @@ public class MqPubMessage implements Serializable {
     /**
      * mq推送数据
      */
-    private Map<String, List<Pair<Double, String>>> pubMsgs;
+    private Map<String, List<Pair<Double, String>>> pubMessages;
 
 
 }

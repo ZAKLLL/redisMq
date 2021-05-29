@@ -1,6 +1,6 @@
 package com.zakl.core;
 
-import com.zakl.protocol.MqMessage;
+import com.zakl.dto.MqMessage;
 
 /**
  * @author ZhangJiaKui

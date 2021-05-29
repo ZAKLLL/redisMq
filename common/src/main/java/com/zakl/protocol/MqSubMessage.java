@@ -1,11 +1,13 @@
 package com.zakl.protocol;
 
+import cn.hutool.core.lang.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -35,7 +37,6 @@ public class MqSubMessage implements Serializable {
     public transient static final byte TYPE_ACK = 0x03;
 
 
-
     /**
      * 消息类型
      */
@@ -58,27 +59,29 @@ public class MqSubMessage implements Serializable {
     public boolean initiativePush = true;
 
 
-
     /**
      * 消息id
      */
     private String messageId;
 
     /**
-     * 订阅的通道
+     * 订阅的通道(服务端主动推送)
+     * only user for first register , null value when other time;
      */
-    private Set<String> channels;
+    private Set<String> activePushKeys;
+
+    /**
+     * 订阅的通道(客户端主动调用)
+     * only user for first register , null value when other time;
+     */
+    private Set<String> passiveCallKeys;
 
 
     /**
-     * 收到消息的通道
+     * messages From Server
      */
-    private String msgChannel;
+    private List<Pair<String, String>> keyValues;
 
-    /**
-     * 收到的具体信息
-     */
-    private String msg;
 
 
 }
