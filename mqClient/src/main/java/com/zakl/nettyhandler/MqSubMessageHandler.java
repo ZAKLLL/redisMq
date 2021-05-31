@@ -27,7 +27,7 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
                 + "channelActive");
 
         MqSubMessage mqSubMessage = new MqSubMessage();
-        mqSubMessage.setMsg("Hello World");
+//        mqSubMessage.setMsg("Hello World");
         ctx.writeAndFlush(mqSubMessage);
         super.channelActive(ctx);
     }

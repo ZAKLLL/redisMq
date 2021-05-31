@@ -1,8 +1,13 @@
 package com.zakl.mqhandler;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Pair;
+import com.zakl.ack.AckCallBack;
+import com.zakl.ack.AckHandler;
 import com.zakl.connection.SubClientInfo;
 import com.zakl.connection.SubClientManager;
 import com.zakl.dto.MqMessage;
+import com.zakl.protocol.MqSubMessage;
 import io.lettuce.core.ScoredValue;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -77,18 +82,18 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
         String clientId = subClientInfo.getClientId();
         if (!SubClientManager.clientAliveMap.get(clientId).get()) {
             log.info("subClient {} 离线,channel 信息{}", clientId, subClientInfo.getContext());
+            //退回到redis
             RedisUtil.syncSortedSetAdd(mqMessage);
-            Condition condition = sortedSetHandleConditionMap.get(clientId);
-
-//            condition
             return;
         }
         ChannelHandlerContext ctx = subClientInfo.getContext();
 
-
-        //todo Ack机制实现
-        //
-
+        MqSubMessage mqSubMessage = new MqSubMessage();
+        mqSubMessage.setType(MqSubMessage.TYPE_MQ_MESSAGE);
+        mqSubMessage.setMqMessages(ListUtil.toList(mqMessage));
+        ctx.writeAndFlush(mqSubMessage);
+        AckCallBack ackCallBack = new AckCallBack(mqMessage);
+        AckHandler.ackCallBackMap.put(mqMessage.getMessageId(), ackCallBack);
     }
 
 

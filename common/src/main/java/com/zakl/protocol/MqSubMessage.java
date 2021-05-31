@@ -1,6 +1,7 @@
 package com.zakl.protocol;
 
 import cn.hutool.core.lang.Pair;
+import com.zakl.dto.MqMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,9 +33,14 @@ public class MqSubMessage implements Serializable {
     public transient static final byte TYPE_MQ_MESSAGE = 0x02;
 
     /**
-     * ACK确认信息
+     * ACK确认信息 自动确认
      */
-    public transient static final byte TYPE_ACK = 0x03;
+    public transient static final byte TYPE_ACK_AUTO = 0x03;
+
+    /**
+     * ACK确认消息 手动确认
+     */
+    public transient static final byte TYPE_ACK_MANUAL = 0x04;
 
 
     /**
@@ -53,16 +59,6 @@ public class MqSubMessage implements Serializable {
      */
     public Integer clientWeight = -1;
 
-    /**
-     * 是否需要服务器主动推送
-     */
-    public boolean initiativePush = true;
-
-
-    /**
-     * 消息id
-     */
-    private String messageId;
 
 
     /**
@@ -86,7 +82,7 @@ public class MqSubMessage implements Serializable {
     /**
      * messages From Server
      */
-    private List<Pair<String, String>> keyValues;
+    private List<MqMessage> mqMessages;
 
 
 
