@@ -73,11 +73,13 @@ public class SubClientManager {
         }
         Condition condition = conditionMap.get(keyName);
         Lock lock = lockMap.get(keyName);
-        try {
-            lock.lock();
-            condition.signal();
-        } finally {
-            lock.unlock();
+        if (StatusManager.canConsumeStatusMap.get(keyName)) {
+            try {
+                lock.lock();
+                condition.signal();
+            } finally {
+                lock.unlock();
+            }
         }
     }
 

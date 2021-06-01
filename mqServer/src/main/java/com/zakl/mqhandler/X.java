@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.zakl.statusManage.StatusManager.statusMap;
+import static com.zakl.statusManage.StatusManager.canConsumeStatusMap;
 import static com.zakl.statusManage.SubClientManager.*;
 import static com.zakl.statusManage.MqKeysManager.activePushKeys;
 import static com.zakl.statusManage.MqKeysManager.passiveCallKeys;
@@ -87,6 +87,7 @@ public class X {
 
                     sortedSetHandleLockMap.putIfAbsent(keyName, lock);
 
+                    //todo 第一次注册
                     sortedSetClientMap.computeIfAbsent(keyName, v -> clientPq).add(clientInfo);
 
                 } else {
@@ -106,28 +107,28 @@ public class X {
 
                 clientAliveMap.put(clientInfo.getClientId(), clientAlive);
 
-
-                //只监听
-                executors.submit(() -> {
-
-                    while (true) {
-                        if (clientAlive.get()) {
-                            log.info("{} offline", clientInfo);
-                            cleanSubClientInfo(keyName, clientInfo);
-                            break;
-                        }
-                        lock.lock();
-                        while (statusMap.get(keyName)) {
-                            handleRcvAndDistribute(keyName);
-                        }
-                        try {
-                            consumeCondition.await();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        lock.unlock();
-                    }
-                });
+//
+//                //只监听
+//                executors.submit(() -> {
+//
+//                    while (true) {
+//                        if (clientAlive.get()) {
+//                            log.info("{} offline", clientInfo);
+//                            cleanSubClientInfo(keyName, clientInfo);
+//                            break;
+//                        }
+//                        lock.lock();
+//                        while (canConsumeStatusMap.get(keyName)) {
+//                            handleRcvAndDistribute(keyName);
+//                        }
+//                        try {
+//                            consumeCondition.await();
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                        lock.unlock();
+//                    }
+//                });
             }
         }
     }
@@ -144,19 +145,6 @@ public class X {
     }
 
 
-    public static void handleRcvAndDistribute(String keyName) {
-        PubMsgBufHandle msgBufHandler;
-        MqMsgDistributeHandle distributeHandler;
-        if (checkIfSortedSet(keyName)) {
-            msgBufHandler = PriorityPubMsgBufBufHandler.getInstance();
-            distributeHandler = PriorityMsgDistributeHandler.getInstance();
-        } else {
-            msgBufHandler = FifoPubMsgBufBufHandler.getInstance();
-            distributeHandler = FifoMsgDistributeHandler.getInstance();
-        }
-        MqMessage mqMessage = msgBufHandler.listen(keyName);
-        distributeHandler.distribute(mqMessage, keyName);
-    }
 
     /**
      * 注册一个新的SortedSet到Redis
