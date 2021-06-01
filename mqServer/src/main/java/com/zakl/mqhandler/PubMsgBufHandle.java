@@ -2,6 +2,9 @@ package com.zakl.mqhandler;
 
 import com.zakl.dto.MqMessage;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author ZhangJiaKui
  * @classname PubMsgHandler
@@ -11,12 +14,11 @@ import com.zakl.dto.MqMessage;
 public interface PubMsgBufHandle {
 
 
-
-
     MqMessage listen(String keyName);
 
 
-    void add(String keyName, MqMessage mqMessage, boolean tail);
+    void add(boolean tail, String keyName, MqMessage... mqMessage);
 
+    void add(boolean tail, Map<String, List<MqMessage>> keyMsgs);
 
 }

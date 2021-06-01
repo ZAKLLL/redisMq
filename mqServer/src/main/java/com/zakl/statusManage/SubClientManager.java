@@ -1,4 +1,6 @@
-package com.zakl.connection;
+package com.zakl.statusManage;
+
+import com.zakl.mqhandler.MqHandleUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,6 +54,32 @@ public class SubClientManager {
      * clientId->clientInfo including(clientId,weight,channelCtx)
      */
     public final static Map<String, SubClientInfo> clientMap = new ConcurrentHashMap<>(16);
+
+
+    /**
+     * remind key's consume thread can continue consume
+     *
+     * @param keyName
+     */
+    public static void remindConsume(String keyName) {
+        Map<String, Lock> lockMap;
+        Map<String, Condition> conditionMap;
+        if (MqHandleUtil.checkIfSortedSet(keyName)) {
+            lockMap = sortedSetHandleLockMap;
+            conditionMap = sortedSetHandleConditionMap;
+        } else {
+            lockMap = listHandleLockMap;
+            conditionMap = listHandleConditionMap;
+        }
+        Condition condition = conditionMap.get(keyName);
+        Lock lock = lockMap.get(keyName);
+        try {
+            lock.lock();
+            condition.signal();
+        } finally {
+            lock.unlock();
+        }
+    }
 
 
 }

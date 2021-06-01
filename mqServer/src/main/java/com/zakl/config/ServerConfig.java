@@ -1,7 +1,7 @@
 package com.zakl.config;
 
-import com.zakl.util.ConfigUtil;
 import com.zakl.protocol.MqPubMessage;
+import com.zakl.util.ConfigUtil;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.container.MqServerContainer;
 import lombok.Data;

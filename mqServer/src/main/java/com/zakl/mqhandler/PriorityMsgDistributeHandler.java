@@ -1,11 +1,10 @@
 package com.zakl.mqhandler;
 
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.lang.Pair;
 import com.zakl.ack.AckCallBack;
 import com.zakl.ack.AckHandler;
-import com.zakl.connection.SubClientInfo;
-import com.zakl.connection.SubClientManager;
+import com.zakl.statusManage.SubClientInfo;
+import com.zakl.statusManage.SubClientManager;
 import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.lettuce.core.ScoredValue;
@@ -13,9 +12,6 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.locks.Condition;
-
-import static com.zakl.connection.SubClientManager.sortedSetHandleConditionMap;
 
 @Slf4j
 public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {

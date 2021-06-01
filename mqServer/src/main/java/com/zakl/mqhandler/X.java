@@ -2,9 +2,7 @@ package com.zakl.mqhandler;
 
 
 import cn.hutool.core.lang.Pair;
-import com.zakl.connection.CanConsumeMap;
-import com.zakl.connection.SubClientInfo;
-import com.zakl.constant.Constants;
+import com.zakl.statusManage.SubClientInfo;
 import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,9 +19,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.zakl.connection.SubClientManager.*;
-import static com.zakl.connection.MqKeysManager.activePushKeys;
-import static com.zakl.connection.MqKeysManager.passiveCallKeys;
+import static com.zakl.statusManage.StatusManager.statusMap;
+import static com.zakl.statusManage.SubClientManager.*;
+import static com.zakl.statusManage.MqKeysManager.activePushKeys;
+import static com.zakl.statusManage.MqKeysManager.passiveCallKeys;
+import static com.zakl.mqhandler.MqHandleUtil.checkIfSortedSet;
 
 @Slf4j
 public class X {
@@ -117,7 +117,7 @@ public class X {
                             break;
                         }
                         lock.lock();
-                        while (CanConsumeMap.statusMap.get(keyName)) {
+                        while (statusMap.get(keyName)) {
                             handleRcvAndDistribute(keyName);
                         }
                         try {
@@ -169,9 +169,7 @@ public class X {
         RedisUtil.syncSortedSetAdd(channelName, new Pair<>(MIN_SCORE, KEY_HOLDER + channelName));
     }
 
-    public static boolean checkIfSortedSet(String keyName) {
-        return keyName.startsWith(Constants.MQ_SORTED_SET_PREFIX);
-    }
+
 
 }
 

@@ -1,4 +1,3 @@
-import com.zakl.config.RedisConfig;
 import com.zakl.container.ContainerHelper;
 import com.zakl.container.MqServerContainer;
 import com.zakl.protocol.MqPubMessage;
@@ -18,9 +17,14 @@ public class RedisMqStarter {
 
     private final static NioEventLoopGroup serverBossGroup = new NioEventLoopGroup();
 
+    public static void initServerData() {
+        //todo 将持久化的Redis信息 更新到到服务中
+    }
 
 
     public static void main(String[] args) {
+
+
         MqServerContainer mqServerContainer = new MqServerContainer(serverBossGroup, MqPubMessage.class);
         MqServerContainer mqSubServerContainer = new MqServerContainer(serverBossGroup, MqSubMessage.class);
         ContainerHelper.start(mqServerContainer, mqSubServerContainer);

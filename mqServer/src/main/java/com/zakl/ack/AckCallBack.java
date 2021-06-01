@@ -35,7 +35,7 @@ public class AckCallBack {
         try {
             lock.lock();
             finish.signal();
-            AckHandler.handleAckFailed(mqMessage,ackType);
+            AckHandler.handleAckFailed(mqMessage, ackType);
         } finally {
             lock.unlock();
         }

@@ -7,6 +7,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.ScoredValue;
 import io.lettuce.core.ZAddArgs;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 import io.lettuce.core.support.ConnectionPoolSupport;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.zakl.mqhandler.MqHandleUtil.convertMqMessageToJsonDate;
 
 @Slf4j
 public class RedisUtil {
@@ -83,6 +86,34 @@ public class RedisUtil {
         }
     }
 
+    public static void syncSetAdd(String key, MqMessage... mqMessages) {
+        StatefulRedisConnection<String, String> connection = getConnection();
+        try {
+            RedisCommands<String, String> sync = connection.sync();
+            String[] datas = new String[mqMessages.length];
+            for (int i = 0; i < mqMessages.length; i++) {
+                datas[i] = convertMqMessageToJsonDate(mqMessages[i]);
+            }
+            sync.sadd(key, datas);
+        } finally {
+            returnConnection(connection);
+        }
+    }
+
+    public static void syncSetRemove(String key, MqMessage... mqMessages) {
+        StatefulRedisConnection<String, String> connection = getConnection();
+        try {
+            RedisCommands<String, String> sync = connection.sync();
+            String[] dataes = new String[mqMessages.length];
+            for (int i = 0; i < mqMessages.length; i++) {
+                dataes[i] = convertMqMessageToJsonDate(mqMessages[i]);
+            }
+            sync.srem(key, dataes);
+        } finally {
+            returnConnection(connection);
+        }
+    }
+
 
     public static ScoredValue<String> syncSortedSetPopMax(String key) {
         StatefulRedisConnection<String, String> connection = getConnection();
@@ -110,6 +141,7 @@ public class RedisUtil {
         returnConnection(connection);
         return rpop;
     }
+
 
 
 }

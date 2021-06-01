@@ -1,13 +1,18 @@
 package com.zakl.mqhandler;
 
+import com.zakl.statusManage.SubClientManager;
 import com.zakl.dto.MqMessage;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.zakl.constant.Constants.PUB_BUFFER_MAX_LIMIT;
 
+@Slf4j
 public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
 
 
@@ -38,21 +43,55 @@ public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
         return mqMessages.isEmpty() ? null : mqMessages.pollFirst();
     }
 
-    public void add(String keyName, MqMessage mqMessage, boolean tail) {
+
+    @Override
+    public void add(boolean tail, String keyName, MqMessage... mqMessages) {
         if (!sortedSetBufMap.containsKey(keyName)) {
-            throw new RuntimeException("当前Channel不存在");
+            log.info("当前key{} 不存在,创建新的bufKey...", keyName);
+            sortedSetBufMap.put(keyName, new LinkedBlockingDeque<>());
         }
+
         LinkedBlockingDeque<MqMessage> msgBuffers = sortedSetBufMap.get(keyName);
         if (msgBuffers.size() > PUB_BUFFER_MAX_LIMIT) {
-            RedisUtil.syncSortedSetAdd(mqMessage);
+            RedisUtil.syncSortedSetAdd(mqMessages);
         }
-        if (tail) {
-            msgBuffers.addLast(mqMessage);
-        } else {
-            msgBuffers.addFirst(mqMessage);
+        for (MqMessage mqMessage : mqMessages) {
+            if (tail) {
+                msgBuffers.addLast(mqMessage);
+            } else {
+                msgBuffers.addFirst(mqMessage);
+            }
         }
     }
 
 
+    @Override
+    public void add(boolean tail, Map<String, List<MqMessage>> keyMsgs) {
+        List<MqMessage> directToRedis = new ArrayList<>();
 
+        for (Map.Entry<String, List<MqMessage>> kv : keyMsgs.entrySet()) {
+            String keyName = kv.getKey();
+            if (!sortedSetBufMap.containsKey(keyName)) {
+                log.info("current key{} doesn't exist,do init new key info in server ", keyName);
+
+                //todo 为该新的key
+                sortedSetBufMap.put(keyName, new LinkedBlockingDeque<>());
+            }
+            List<MqMessage> msgs = kv.getValue();
+            LinkedBlockingDeque<MqMessage> msgBuffers = sortedSetBufMap.get(keyName);
+            if (msgBuffers.size() > PUB_BUFFER_MAX_LIMIT) {
+                directToRedis.addAll(msgs);
+            }
+            for (MqMessage msg : msgs) {
+                if (tail) {
+                    msgBuffers.addLast(msg);
+                } else {
+                    msgBuffers.addFirst(msg);
+                }
+            }
+            //当前key处于可消费状态
+            SubClientManager.remindConsume(keyName);
+        }
+        RedisUtil.syncSortedSetAdd(directToRedis.toArray(new MqMessage[0]));
+    }
 }

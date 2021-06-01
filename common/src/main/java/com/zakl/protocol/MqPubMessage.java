@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class MqPubMessage implements Serializable {
 
     /**
@@ -31,9 +33,9 @@ public class MqPubMessage implements Serializable {
     private byte type;
 
     /**
-     * 消息id
+     * clientId
      */
-    private String messageId;
+    private String clientId;
 
 
     /**

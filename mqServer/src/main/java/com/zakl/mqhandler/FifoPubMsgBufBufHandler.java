@@ -2,6 +2,9 @@ package com.zakl.mqhandler;
 
 import com.zakl.dto.MqMessage;
 
+import java.util.List;
+import java.util.Map;
+
 public class FifoPubMsgBufBufHandler implements PubMsgBufHandle {
 
     private final static FifoPubMsgBufBufHandler instance = new FifoPubMsgBufBufHandler();
@@ -20,7 +23,14 @@ public class FifoPubMsgBufBufHandler implements PubMsgBufHandle {
     }
 
     @Override
-    public void add(String keyName, MqMessage mqMessage, boolean tail) {
+    public void add(boolean tail, String keyName, MqMessage... mqMessage) {
+
+    }
+
+    @Override
+    public void add(boolean tail, Map<String, List<MqMessage>> keyMsgs) {
+
+
 
     }
 }
