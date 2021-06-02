@@ -1,6 +1,6 @@
-package com.zakl.nettyrpc.log.annotation;
+package com.zakl.log.annotation;
 
-import com.zakl.nettyrpc.log.enums.OperationType;
+import com.zakl.log.enums.OperationType;
 
 import java.lang.annotation.*;
 

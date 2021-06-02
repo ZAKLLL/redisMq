@@ -1,4 +1,4 @@
-package com.zakl.nettyrpc.log.utils;
+package com.zakl.log.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

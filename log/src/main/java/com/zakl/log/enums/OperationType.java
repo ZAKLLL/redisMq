@@ -1,4 +1,4 @@
-package com.zakl.nettyrpc.log.enums;
+package com.zakl.log.enums;
 
 /**
  * The enum Operation type.

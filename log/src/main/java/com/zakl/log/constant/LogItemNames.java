@@ -1,4 +1,4 @@
-package com.zakl.nettyrpc.log.constant;
+package com.zakl.log.constant;
 
 /**
  * MDC中存储的字段名常量

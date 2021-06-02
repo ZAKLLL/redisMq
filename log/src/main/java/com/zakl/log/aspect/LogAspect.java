@@ -1,8 +1,8 @@
-package com.zakl.nettyrpc.log.aspect;
+package com.zakl.log.aspect;
 
-import com.zakl.nettyrpc.log.annotation.OperationLog;
-import com.zakl.nettyrpc.log.constant.LogItemNames;
-import com.zakl.nettyrpc.log.utils.OutputLogParameter;
+import com.zakl.log.utils.OutputLogParameter;
+import com.zakl.log.annotation.OperationLog;
+import com.zakl.log.constant.LogItemNames;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,8 +11,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.MDC;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -23,10 +21,12 @@ import java.time.format.FormatStyle;
 @Slf4j
 public class LogAspect {
 
+//    private final static Logger log = LoggerFactory.getLogger(LogAspect.class);
+
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
 
 
-    @Pointcut("@annotation(com.zakl.nettyrpc.log.annotation.OperationLog)")
+    @Pointcut("@annotation(com.zakl.log.annotation.OperationLog)")
     public void operationLog() {
     }
 
@@ -111,9 +111,6 @@ public class LogAspect {
         StringBuilder sb = new StringBuilder();
         for (Object obj : args) {
             // HttpServletRequest,HttpServletResponse不输出
-            if (obj instanceof HttpServletRequest || obj instanceof HttpServletResponse) {
-                continue;
-            }
             // 反序列化obj的属性到相应参数中.
             sb.append(obj == null ? "null," : OutputLogParameter.printFields(obj, "", 0) + ",");
             sb.setLength(sb.length() - 1);

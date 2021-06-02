@@ -1,6 +1,6 @@
-package com.zakl.nettyrpc.log.utils;
+package com.zakl.log.utils;
 
-import com.zakl.nettyrpc.log.constant.LogItemNames;
+import com.zakl.log.constant.LogItemNames;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.spi.LocationAwareLogger;

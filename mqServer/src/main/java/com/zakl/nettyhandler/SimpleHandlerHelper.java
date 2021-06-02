@@ -1,5 +1,6 @@
 package com.zakl.nettyhandler;
 
+import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.SimpleChannelInboundHandler;
 
