@@ -12,6 +12,7 @@
         <module>mqServer</module>
         <module>mqClient</module>
         <module>common</module>
+        <module>log</module>
     </modules>
 
 

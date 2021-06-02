@@ -7,16 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.zakl.constant.Constants.ACK_SET_KEY;
+
 @Slf4j
 public class AckHandler {
 
 
     public static final Map<String, AckCallBack> ackCallBackMap = new ConcurrentHashMap<>();
 
-    /**
-     * redis用来存放ack确认信息
-     */
-    public static final String ACK_SET_KEY = "ack:key:set";
 
     /**
      * 成功推送Ack的type

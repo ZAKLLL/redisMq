@@ -13,14 +13,37 @@ public interface Constants {
     Integer PUB_BUFFER_MAX_LIMIT = 100000;
 
     /**
+     * REDIS Request TimeOut limit
+     */
+    Integer TIME_OUT_LIMIT = 10000;
+
+
+    /**
      * 以List数据结构实现的Mq队列 key名称前缀
      */
-    String MQ_LIST_PREFIX = "MQ_LIST:";
+    String MQ_LIST_PREFIX = "MQ:LIST:";
 
     /**
      * 以Sorted_Set 数据结构实现的Mq队列 Key 名称前缀
      */
-    String MQ_SORTED_SET_PREFIX = "MQ_SORTED_SET:";
+    String MQ_SORTED_SET_PREFIX = "MQ:SORTED_SET:";
+
+
+    /**
+     * MQ 服务所有存放在redisServer中的前缀
+     */
+    String REDIS_PREFIX = "MQ:";
+
+
+    /**
+     * ack info in redis
+     */
+    String ACK_SET_KEY = "MQ:ACK:SET:";
+
+    /**
+     * sortedSet placeholder score
+     */
+    Double MIN_SCORE = Double.MIN_VALUE;
 
 
 }

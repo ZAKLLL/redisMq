@@ -2,8 +2,11 @@ package com.zakl.mqhandler;
 
 
 import com.zakl.dto.MqMessage;
+import com.zakl.statusManage.StatusManager;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -20,32 +23,44 @@ import static com.zakl.mqhandler.MqHandleUtil.checkIfSortedSet;
 @Slf4j
 public class KeyMsgDistributeThread extends Thread {
 
-    public final Lock lock;
-    public final String keyName;
-    public final Condition canConsumeCondition;
-    public final AtomicBoolean canConsumeFlag;
+
+    private final static ExecutorService executors = Executors.newCachedThreadPool();
+
+    public final static String THREAD_NAME_PREFIX = "thread:keyDistribute:";
+
+    private final Lock lock;
+    private final String keyName;
+    private final Condition canConsumeCondition;
+    private final AtomicBoolean canConsumeFlag;
 
     public KeyMsgDistributeThread(Lock lock, String keyName, Condition canConsumeCondition, AtomicBoolean canConsumeFlag) {
         this.lock = lock;
         this.keyName = keyName;
         this.canConsumeCondition = canConsumeCondition;
         this.canConsumeFlag = canConsumeFlag;
+        super.setName(THREAD_NAME_PREFIX+keyName);
     }
 
 
     @Override
     public void run() {
         while (true) {
-            lock.lock();
-            while (canConsumeFlag.get()) {
-                handleRcvAndDistribute(keyName);
-            }
             try {
-                canConsumeCondition.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                lock.lock();
+                while (canConsumeFlag.get()) {
+                    handleRcvAndDistribute(keyName);
+                }
+                try {
+                    log.info("key {} is empty,wait for publish", keyName);
+                    canConsumeCondition.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    log.error("key {} mqMsg distribute thread error,restart distributeThread", keyName);
+                    StatusManager.resetKeyStatus(keyName, canConsumeFlag);
+                }
+            } finally {
+                lock.unlock();
             }
-            lock.unlock();
         }
     }
 
@@ -63,4 +78,9 @@ public class KeyMsgDistributeThread extends Thread {
         distributeHandler.distribute(mqMessage, keyName);
     }
 
+
+    public static void startANewMsgDistributeThread(KeyMsgDistributeThread thread) {
+        log.info("key {} start a mqMsg distribute thread ", thread.keyName);
+        executors.submit(thread);
+    }
 }

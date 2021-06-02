@@ -4,7 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import com.zakl.ack.AckCallBack;
 import com.zakl.ack.AckHandler;
 import com.zakl.statusManage.SubClientInfo;
-import com.zakl.statusManage.SubClientManager;
+import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.lettuce.core.ScoredValue;
@@ -68,7 +68,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
      */
     private static void doDistribute(MqMessage mqMessage) {
         if (mqMessage == null) return;
-        PriorityBlockingQueue<SubClientInfo> subClientInfos = SubClientManager.sortedSetClientMap.get(mqMessage.getKey());
+        PriorityBlockingQueue<SubClientInfo> subClientInfos = MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey());
 
         if (subClientInfos.isEmpty()) {
             throw new RuntimeException("无法正常获取连接key对应的subClient");
@@ -76,7 +76,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
 
         SubClientInfo subClientInfo = subClientInfos.poll();
         String clientId = subClientInfo.getClientId();
-        if (!SubClientManager.clientAliveMap.get(clientId).get()) {
+        if (!MqKeyHandleStatusManager.clientAliveMap.get(clientId).get()) {
             log.info("subClient {} 离线,channel 信息{}", clientId, subClientInfo.getContext());
             //退回到redis
             RedisUtil.syncSortedSetAdd(mqMessage);

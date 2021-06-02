@@ -1,13 +1,13 @@
 package com.zakl.mqhandler;
 
-import com.zakl.statusManage.SubClientManager;
 import com.zakl.dto.MqMessage;
+import com.zakl.statusManage.MqKeyHandleStatusManager;
+import com.zakl.statusManage.StatusManager;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.zakl.constant.Constants.PUB_BUFFER_MAX_LIMIT;
@@ -16,7 +16,7 @@ import static com.zakl.constant.Constants.PUB_BUFFER_MAX_LIMIT;
 public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
 
 
-    private final static Map<String, LinkedBlockingDeque<MqMessage>> sortedSetBufMap = new ConcurrentHashMap<>();
+    private final static Map<String, LinkedBlockingDeque<MqMessage>> sortedSetBufMap = MqKeyHandleStatusManager.keyMessagesBufMap;
 
 
     private PriorityPubMsgBufBufHandler() {
@@ -73,9 +73,7 @@ public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
             String keyName = kv.getKey();
             if (!sortedSetBufMap.containsKey(keyName)) {
                 log.info("current key{} doesn't exist,do init new key info in server ", keyName);
-
-                //todo 为该新的key
-                sortedSetBufMap.put(keyName, new LinkedBlockingDeque<>());
+                StatusManager.initNewKey(keyName);
             }
             List<MqMessage> msgs = kv.getValue();
             LinkedBlockingDeque<MqMessage> msgBuffers = sortedSetBufMap.get(keyName);
@@ -90,7 +88,7 @@ public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
                 }
             }
             //当前key处于可消费状态
-            SubClientManager.remindConsume(keyName);
+            MqKeyHandleStatusManager.remindConsume(keyName);
         }
         RedisUtil.syncSortedSetAdd(directToRedis.toArray(new MqMessage[0]));
     }
