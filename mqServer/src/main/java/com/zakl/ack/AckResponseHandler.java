@@ -30,7 +30,7 @@ public class AckResponseHandler {
     /**
      * @param mqMessage
      */
-    public static void handleAckSuccessFully(MqMessage mqMessage) {
+    public static void handleAckSuccessFailed(MqMessage mqMessage) {
         ackCallBackMap.remove(mqMessage.getKey());
         //重新发送到ACK中
         RedisUtil.syncSortedSetAdd(mqMessage);

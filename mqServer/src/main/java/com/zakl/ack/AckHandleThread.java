@@ -48,7 +48,8 @@ public class AckHandleThread extends Thread {
             return;
         }
         log.info("submit New AckHandleRequest,MqMsg:{}", ackCallBack.getMqMessage());
-        AckResponseHandler.ackCallBackMap.put(ackCallBack.getMqMessage().getMessageId(), ackCallBack);
+        String messageId = ackCallBack.getMqMessage().getMessageId();
+        AckResponseHandler.ackCallBackMap.put(messageId, ackCallBack);
         lock.lock();
         try {
             ackCallBackRef.set(ackCallBack);

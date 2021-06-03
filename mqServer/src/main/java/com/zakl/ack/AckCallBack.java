@@ -38,7 +38,6 @@ public class AckCallBack {
         }
     }
 
-    //todo handle ack response
     public void over(byte ackType) {
         try {
             lock.lock();
@@ -53,7 +52,7 @@ public class AckCallBack {
         boolean timeout = false;
         try {
             timeout = finish.await(10000, TimeUnit.MILLISECONDS);
-            AckResponseHandler.handleAckSuccessFully(mqMessage);
+            AckResponseHandler.handleAckSuccessFailed(mqMessage);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

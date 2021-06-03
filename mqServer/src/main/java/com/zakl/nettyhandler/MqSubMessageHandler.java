@@ -1,6 +1,8 @@
 package com.zakl.nettyhandler;
 
+import com.zakl.ack.AckCallBack;
 import com.zakl.ack.AckHandleThreadManager;
+import com.zakl.ack.AckResponseHandler;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.statusManage.StatusManager;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.zakl.statusManage.MqKeyDistributeTypeManager.activePushKeys;
@@ -37,13 +40,11 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
         switch (type) {
             case MqSubMessage.TYPE_SUBSCRIBE: {
                 registerSubClient(ctx, msg);
-
                 break;
             }
             case MqSubMessage.TYPE_ACK_AUTO:
             case MqSubMessage.TYPE_ACK_MANUAL: {
-                //todo
-                System.out.println("ss");
+                ackResponseHandle(msg.getAckMsgIdSet(), type);
                 break;
             }
             default: {
@@ -77,10 +78,12 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
 
     private void registerSubClient(ChannelHandlerContext ctx, MqSubMessage msg) {
 
-
         activePushKeys.addAll(msg.getActivePushKeys());
         passiveCallKeys.addAll(msg.getPassiveCallKeys());
         SubClientInfo subClientInfo = new SubClientInfo(msg.clientId, msg.getClientWeight(), ctx);
+
+        log.info("register new client: {}", subClientInfo);
+
         clientIdMap.put(msg.getClientId(), subClientInfo);
         ctxClientMap.put(ctx, subClientInfo);
         for (final String keyName : msg.getAllKeys()) {
@@ -92,8 +95,16 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
 
     private void cleanSubClientInfo(ChannelHandlerContext ctx) {
         SubClientInfo clientInfo = ctxClientMap.remove(ctx);
+        log.info("remove offLine subClient: {},ctx: {}", clientInfo, ctx);
         AckHandleThreadManager.removeAckHandleThread(clientInfo);
     }
 
 
+    private void ackResponseHandle(Set<String> ackMsgIdSet, byte type) {
+        for (String msgId : ackMsgIdSet) {
+            log.info("messageId:{} receive Ack ,type:{}", msgId, type);
+            AckCallBack ackCallBack = AckResponseHandler.ackCallBackMap.get(msgId);
+            ackCallBack.over(type);
+        }
+    }
 }

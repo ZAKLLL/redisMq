@@ -56,11 +56,15 @@ public class MqSubMessage implements Serializable {
     public String clientId;
 
     /**
-     * 客户端权重
+     * clientWeight
      */
     public Integer clientWeight = -1;
 
 
+    /**
+     * ackMsgIdSet
+     */
+    public Set<String> ackMsgIdSet;
 
     /**
      * key 将会为 自动转换为 MQ_LIST:key or MQ_SORTED_SET:key
