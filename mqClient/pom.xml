@@ -24,12 +24,6 @@
             <artifactId>netty-all</artifactId>
         </dependency>
 
-
-        <dependency>
-            <groupId>com.zakl</groupId>
-            <artifactId>log</artifactId>
-            <version>${moudle.common.version}</version>
-        </dependency>
     </dependencies>
 
 
@@ -43,11 +37,7 @@
                     <target>8</target>
                 </configuration>
             </plugin>
-
-            <!--aspectj-->
-
         </plugins>
-
-
     </build>
+
 </project>

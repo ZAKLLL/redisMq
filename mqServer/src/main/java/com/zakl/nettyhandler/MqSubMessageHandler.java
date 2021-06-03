@@ -1,6 +1,7 @@
 package com.zakl.nettyhandler;
 
 import com.zakl.protocol.MqSubMessage;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.util.Date;
  * @date 5/27/2021 3:05 PM
  */
 @Slf4j
+@ChannelHandler.Sharable
 public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessage> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MqSubMessage msg) throws Exception {

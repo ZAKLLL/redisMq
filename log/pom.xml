@@ -51,73 +51,73 @@
     </dependencies>
 
 
-    <build>
-        <plugins>
+<!--    <build>-->
+<!--        <plugins>-->
 
-            <!--aspectj With Lombok compile config     when ide run need **Delegate IDE build/run actions to Maven**    -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.10</version>
+<!--            &lt;!&ndash;aspectj With Lombok compile config     when ide run need **Delegate IDE build/run actions to Maven**    &ndash;&gt;-->
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>aspectj-maven-plugin</artifactId>-->
+<!--                <version>1.10</version>-->
 
-                <configuration>
-                    <complianceLevel>8</complianceLevel>
-                    <source>8</source>
-                    <target>8</target>
-                    <showWeaveInfo>true</showWeaveInfo>
-                    <verbose>true</verbose>
-                    <Xlint>ignore</Xlint>
-                    <encoding>UTF-8</encoding>
-
-
-                    <!-- IMPORTANT-->
-                    <excludes>
-                        <exclude>**/*.java</exclude>
-                    </excludes>
-                    <forceAjcCompile>true</forceAjcCompile>
-                    <sources/>
-                    <!-- IMPORTANT-->
+<!--                <configuration>-->
+<!--                    <complianceLevel>8</complianceLevel>-->
+<!--                    <source>8</source>-->
+<!--                    <target>8</target>-->
+<!--                    <showWeaveInfo>true</showWeaveInfo>-->
+<!--                    <verbose>true</verbose>-->
+<!--                    <Xlint>ignore</Xlint>-->
+<!--                    <encoding>UTF-8</encoding>-->
 
 
-                    <aspectLibraries>
-                        <aspectLibrary>
-                            <groupId>org.aspectj</groupId>
-                            <artifactId>aspectjweaver</artifactId>
-                        </aspectLibrary>
-                    </aspectLibraries>
+<!--                    &lt;!&ndash; IMPORTANT&ndash;&gt;-->
+<!--                    <excludes>-->
+<!--                        <exclude>**/*.java</exclude>-->
+<!--                    </excludes>-->
+<!--                    <forceAjcCompile>true</forceAjcCompile>-->
+<!--                    <sources/>-->
+<!--                    &lt;!&ndash; IMPORTANT&ndash;&gt;-->
 
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <!-- use this goal to weave all your main classes -->
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <weaveDirectories>
-                                <weaveDirectory>${project.build.directory}/classes</weaveDirectory>
-                            </weaveDirectories>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <!-- use this goal to weave all your test classes -->
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <weaveDirectories>
-                                <weaveDirectory>${project.build.directory}/test-classes</weaveDirectory>
-                            </weaveDirectories>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+
+<!--                    <aspectLibraries>-->
+<!--                        <aspectLibrary>-->
+<!--                            <groupId>org.aspectj</groupId>-->
+<!--                            <artifactId>aspectjweaver</artifactId>-->
+<!--                        </aspectLibrary>-->
+<!--                    </aspectLibraries>-->
+
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>default-compile</id>-->
+<!--                        <phase>process-classes</phase>-->
+<!--                        <goals>-->
+<!--                            &lt;!&ndash; use this goal to weave all your main classes &ndash;&gt;-->
+<!--                            <goal>compile</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <weaveDirectories>-->
+<!--                                <weaveDirectory>${project.build.directory}/classes</weaveDirectory>-->
+<!--                            </weaveDirectories>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>default-testCompile</id>-->
+<!--                        <phase>process-test-classes</phase>-->
+<!--                        <goals>-->
+<!--                            &lt;!&ndash; use this goal to weave all your test classes &ndash;&gt;-->
+<!--                            <goal>test-compile</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <weaveDirectories>-->
+<!--                                <weaveDirectory>${project.build.directory}/test-classes</weaveDirectory>-->
+<!--                            </weaveDirectories>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 
 
 </project>

@@ -23,6 +23,14 @@ public class MqHandleUtil {
         return keyName.startsWith(Constants.MQ_SORTED_SET_PREFIX);
     }
 
+    public static boolean checkIfList(String keyName) {
+        return keyName.startsWith(Constants.MQ_SORTED_SET_PREFIX);
+    }
+
+    public static boolean checkIfKeyValid(String keyName){
+        return checkIfSortedSet(keyName)||checkIfList(keyName);
+    }
+
 
     /**
      * convertMqMessageToJsonDate

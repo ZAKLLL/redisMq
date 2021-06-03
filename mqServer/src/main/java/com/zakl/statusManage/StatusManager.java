@@ -51,6 +51,7 @@ public class StatusManager {
             registerNewSortedSet(keyName);
             log.info("start register new sorted Set in redis succeed ");
         }
+
         if (clients.length > 0) {
             PriorityBlockingQueue<SubClientInfo> clientPq = new PriorityBlockingQueue<>(16, subClientComparator);
             keyClientsMap.put(keyName, clientPq);
@@ -88,7 +89,7 @@ public class StatusManager {
         }
 
         log.info("start init keys info from redis");
-        List<String> keys = syncKeys(REDIS_PREFIX);
+        List<String> keys = syncKeys(REDIS_PREFIX + "*");
         for (String key : keys) {
             //data key
             if (key.startsWith(MQ_LIST_PREFIX) || key.startsWith(MQ_SORTED_SET_PREFIX)) {

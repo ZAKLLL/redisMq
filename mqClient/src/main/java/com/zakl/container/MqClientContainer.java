@@ -64,6 +64,6 @@ public class MqClientContainer implements Container {
 
     public static void main(String[] args) {
         new MqClientContainer(true).start();
-        new MqClientContainer(false).start();
+//        new MqClientContainer(false).start();
     }
 }

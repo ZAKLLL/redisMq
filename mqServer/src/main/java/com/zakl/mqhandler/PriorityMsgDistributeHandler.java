@@ -2,7 +2,9 @@ package com.zakl.mqhandler;
 
 import cn.hutool.core.collection.ListUtil;
 import com.zakl.ack.AckCallBack;
-import com.zakl.ack.AckHandler;
+import com.zakl.ack.AckHandleThread;
+import com.zakl.ack.AckHandleThreadManager;
+import com.zakl.ack.AckResponseHandler;
 import com.zakl.statusManage.SubClientInfo;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.dto.MqMessage;
@@ -17,6 +19,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
 
     private final static PriorityMsgDistributeHandler instance = new PriorityMsgDistributeHandler();
+
 
     private PriorityMsgDistributeHandler() {
 
@@ -84,12 +87,18 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
         }
         ChannelHandlerContext ctx = subClientInfo.getContext();
 
+
         MqSubMessage mqSubMessage = new MqSubMessage();
         mqSubMessage.setType(MqSubMessage.TYPE_MQ_MESSAGE);
         mqSubMessage.setMqMessages(ListUtil.toList(mqMessage));
         ctx.writeAndFlush(mqSubMessage);
+
+
+        // ack handle non-blocking
         AckCallBack ackCallBack = new AckCallBack(mqMessage);
-        AckHandler.ackCallBackMap.put(mqMessage.getMessageId(), ackCallBack);
+        AckHandleThreadManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
+
+
     }
 
 

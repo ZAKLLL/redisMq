@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import static com.zakl.constant.Constants.PUB_BUFFER_MAX_LIMIT;
+import static com.zakl.config.ServerConfig.PUB_BUFFER_MAX_LIMIT;
+
 
 @Slf4j
 public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
@@ -67,8 +68,8 @@ public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
 
     @Override
     public void add(boolean tail, Map<String, List<MqMessage>> keyMsgs) {
+        if (keyMsgs == null || keyMsgs.isEmpty()) return;
         List<MqMessage> directToRedis = new ArrayList<>();
-
         for (Map.Entry<String, List<MqMessage>> kv : keyMsgs.entrySet()) {
             String keyName = kv.getKey();
             if (!sortedSetBufMap.containsKey(keyName)) {

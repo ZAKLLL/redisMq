@@ -6,7 +6,7 @@ import com.zakl.dto.MqMessage;
 
 import java.util.List;
 
-public class Demo {
+public class MqSubDemo {
 
     @MqSubScribe(keys = {"k1", "k2"})
     public void consume(final AckHandler ackHandler, List<MqMessage> msgs) {

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.zakl.constant.Constants.ACK_SET_KEY;
 
 @Slf4j
-public class AckHandler {
+public class AckResponseHandler {
 
 
     public static final Map<String, AckCallBack> ackCallBackMap = new ConcurrentHashMap<>();
@@ -22,7 +22,7 @@ public class AckHandler {
      * @param message
      * @param ackType
      */
-    public static void handleAckFailed(MqMessage message, byte ackType) {
+    public static void handleAckSuccessFully(MqMessage message, byte ackType) {
         log.info("{}消息发送成功AckType:{}", message, ackType);
     }
 
@@ -30,7 +30,7 @@ public class AckHandler {
     /**
      * @param mqMessage
      */
-    public static void handleAckFailed(MqMessage mqMessage) {
+    public static void handleAckSuccessFully(MqMessage mqMessage) {
         ackCallBackMap.remove(mqMessage.getKey());
         //重新发送到ACK中
         RedisUtil.syncSortedSetAdd(mqMessage);
