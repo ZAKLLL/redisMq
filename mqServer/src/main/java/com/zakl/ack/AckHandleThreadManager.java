@@ -41,4 +41,9 @@ public class AckHandleThreadManager {
         }
         return AckHandleThreadMap.get(clientId);
     }
+
+    public static void removeAckHandleThread(SubClientInfo subClientInfo) {
+        AckHandleThread ackHandleThread = AckHandleThreadMap.remove(subClientInfo.getClientId());
+        ackHandleThread.forceShutDown();
+    }
 }

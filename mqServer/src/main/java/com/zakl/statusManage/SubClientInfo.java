@@ -9,7 +9,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class SubClientInfo {
-    private String clientId;
-    private Integer weight;
-    private ChannelHandlerContext context;
+    private final String clientId;
+    private final Integer weight;
+    private final ChannelHandlerContext context;
+    public volatile boolean isAlive = true;
+
+    public SubClientInfo(String clientId, Integer weight, ChannelHandlerContext context) {
+        this.clientId = clientId;
+        this.weight = weight;
+        this.context = context;
+    }
 }

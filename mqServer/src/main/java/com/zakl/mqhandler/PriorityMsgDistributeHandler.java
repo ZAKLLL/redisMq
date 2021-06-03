@@ -79,7 +79,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
 
         SubClientInfo subClientInfo = subClientInfos.poll();
         String clientId = subClientInfo.getClientId();
-        if (!MqKeyHandleStatusManager.clientAliveMap.get(clientId).get()) {
+        if (!subClientInfo.isAlive) {
             log.info("subClient {} 离线,channel 信息{}", clientId, subClientInfo.getContext());
             //退回到redis
             RedisUtil.syncSortedSetAdd(mqMessage);

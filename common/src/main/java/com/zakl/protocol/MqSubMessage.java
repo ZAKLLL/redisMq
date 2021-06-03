@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -85,5 +86,11 @@ public class MqSubMessage implements Serializable {
     private List<MqMessage> mqMessages;
 
 
+    public List<String> getAllKeys(){
+        List<String> keys=new ArrayList<>();
+        keys.addAll(activePushKeys);
+        keys.addAll(passiveCallKeys);
+        return keys;
+    }
 
 }

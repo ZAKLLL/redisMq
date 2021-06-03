@@ -47,7 +47,7 @@ public class AckHandleThread extends Thread {
         if (ackCallBack == null) {
             return;
         }
-        log.info("submit New AckHandleRequest,MqMsg:{}",ackCallBack.getMqMessage());
+        log.info("submit New AckHandleRequest,MqMsg:{}", ackCallBack.getMqMessage());
         AckResponseHandler.ackCallBackMap.put(ackCallBack.getMqMessage().getMessageId(), ackCallBack);
         lock.lock();
         try {
@@ -58,19 +58,25 @@ public class AckHandleThread extends Thread {
         }
     }
 
+    public void forceShutDown() {
+        subClientInfo.setAlive(false);
+        this.interrupt();
+    }
 
     @Override
     public void run() {
         while (true) {
             lock.lock();
             try {
-                while (ackCallBackRef.get() != null) {
+                while (ackCallBackRef.get() != null && subClientInfo.isAlive) {
                     AckCallBack ackCallBack = this.ackCallBackRef.getAndSet(null);
                     ackCallBack.start(subClientInfo);
                 }
                 condition.await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                log.error("AckHandleThread be Interrupted", e);
+                break;
             } finally {
                 lock.unlock();
             }

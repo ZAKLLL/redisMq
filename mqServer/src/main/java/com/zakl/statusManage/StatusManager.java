@@ -58,7 +58,6 @@ public class StatusManager {
             for (SubClientInfo client : clients) {
                 log.info("register new client {} to server ", client);
                 clientIdMap.put(keyName, client);
-                clientAliveMap.put(keyName, new AtomicBoolean(true));
                 clientPq.add(client);
             }
         }
@@ -126,8 +125,7 @@ public class StatusManager {
 
 
     /**
-     * 注册一个新的SortedSet到Redis
-     *
+     * register a new SortedSet to Redis Server
      * @param channelName
      */
     public static void registerNewSortedSet(String channelName) {

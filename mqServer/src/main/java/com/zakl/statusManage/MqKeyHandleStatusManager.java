@@ -34,11 +34,6 @@ public class MqKeyHandleStatusManager {
 
 
     /**
-     * clientId-alive
-     */
-    public final static Map<String, AtomicBoolean> clientAliveMap = new ConcurrentHashMap<>();
-
-    /**
      * clientId->clientInfo including(clientId,weight,channelCtx)
      */
     public final static Map<String, SubClientInfo> clientIdMap = new ConcurrentHashMap<>(16);
