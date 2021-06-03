@@ -1,6 +1,7 @@
 package com.zakl.nettyhandler;
 
 import com.zakl.protocol.MqSubMessage;
+import com.zakl.util.ReflectionUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +27,11 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
         log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelActive");
 
-        MqSubMessage mqSubMessage = new MqSubMessage();
 
-        ctx.writeAndFlush(mqSubMessage);
         super.channelActive(ctx);
+    }
+
+    public static void doRegisterClient() {
+
     }
 }
