@@ -1,7 +1,6 @@
 package com.zakl.annotation;
 
 
-import cn.hutool.core.lang.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
