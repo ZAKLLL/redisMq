@@ -22,6 +22,7 @@ import static com.zakl.constant.Constants.MIN_SCORE;
 import static com.zakl.mqhandler.MqHandleUtil.convertMqMessageToJsonDate;
 
 @Slf4j
+@SuppressWarnings("all")
 public class RedisUtil {
     private static final GenericObjectPool<StatefulRedisConnection<String, String>> pool;
 
@@ -32,7 +33,7 @@ public class RedisUtil {
 
         log.info("initializing the Lettuce pool ");
 
-        GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig = new GenericObjectPoolConfig();
+        GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig = new GenericObjectPoolConfig<>();
         poolConfig.setMaxIdle(30);
 
         RedisClient client = RedisClient.create(String.format("redis://%s@%s:%d/%d", RedisConfig.pwd, RedisConfig.host, RedisConfig.port, RedisConfig.db));

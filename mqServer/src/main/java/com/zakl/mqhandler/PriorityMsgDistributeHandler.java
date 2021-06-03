@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
+import static com.zakl.mqhandler.MqHandleUtil.convertRedisStringToMqMessage;
+
 @Slf4j
 public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
 
@@ -22,7 +24,6 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
 
 
     private PriorityMsgDistributeHandler() {
-
     }
 
 
@@ -39,7 +40,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
             // 将此信息与RedisServer 中的 max value进行比对,如果当前信息优先级更高,则分发该信息
             MqMessage msgToRedis;
 
-            MqMessage mqMessageFormRedis = convertScoredValueToMqMessage(scoreValue, keyName);
+            MqMessage mqMessageFormRedis = convertRedisStringToMqMessage(keyName, scoreValue.getScore(), scoreValue.getValue());
             //比较权重
             if (bufMsg.getWeight() > scoreValue.getScore()) {
                 //分发 bufMsg
@@ -55,7 +56,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
             msgToDistribute = bufMsg;
         } else if (scoreValue.hasValue()) {
             //buf 区无数据
-            msgToDistribute = convertScoredValueToMqMessage(scoreValue, keyName);
+            msgToDistribute = convertRedisStringToMqMessage(keyName, scoreValue.getScore(), scoreValue.getValue());
         } else {
             // redis 与 buf 区都无数据
             msgToDistribute = null;
@@ -98,18 +99,6 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
         AckCallBack ackCallBack = new AckCallBack(mqMessage);
         AckHandleThreadManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
 
-
-    }
-
-
-    private static MqMessage convertScoredValueToMqMessage(ScoredValue<String> scoreValue, String keyName) {
-        if (!scoreValue.hasValue()) return null;
-        String redisMsg = scoreValue.getValue();
-        //第一行 为uuid
-        String[] uuidAndData = redisMsg.split("\n", 2);
-        String uuid = uuidAndData[0];
-        String data = uuidAndData[1];
-        return new MqMessage(uuid.split(":")[1], scoreValue.getScore(), keyName, data);
     }
 
 }

@@ -19,7 +19,6 @@ public class RedisMqStarter {
     private final static NioEventLoopGroup serverBossGroup = new NioEventLoopGroup();
 
     public static void initServerData() {
-        //todo 将持久化的Redis信息 更新到到服务中
         StatusManager.initFromRedis();
     }
 
