@@ -1,8 +1,8 @@
 package com.zakl.container;
 
 import com.zakl.config.ClientConfig;
-import com.zakl.nettyhandler.MqPubMessageHandler;
-import com.zakl.nettyhandler.MqSubMessageHandler;
+import com.zakl.nettyhandler.MqPubMessageClientHandler;
+import com.zakl.nettyhandler.MqSubMessageClientHandler;
 import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.protostuff.ProtostuffCodecUtil;
@@ -46,7 +46,7 @@ public class MqClientContainer implements Container {
                 ProtostuffCodecUtil msgCodec = new ProtostuffCodecUtil(isPub ? MqPubMessage.class : MqSubMessage.class);
                 ch.pipeline().addLast(new ProtostuffEncoder(msgCodec));
                 ch.pipeline().addLast(new ProtostuffDecoder(msgCodec)); //todo 添加心跳检测handler
-                ch.pipeline().addLast(isPub ? new MqPubMessageHandler() : new MqSubMessageHandler());
+                ch.pipeline().addLast(isPub ? new MqPubMessageClientHandler() : new MqSubMessageClientHandler());
             }
         });
 

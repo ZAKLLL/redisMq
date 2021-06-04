@@ -16,7 +16,7 @@ import java.util.Date;
  * @date 5/27/2021 4:26 PM
  */
 @Slf4j
-public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessage> {
+public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSubMessage> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MqSubMessage msg) throws Exception {
 

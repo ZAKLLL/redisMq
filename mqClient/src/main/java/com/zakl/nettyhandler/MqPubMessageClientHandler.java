@@ -21,7 +21,7 @@ import java.util.*;
  * @date 5/27/2021 4:26 PM
  */
 @Slf4j
-public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqSubMessage> {
+public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqSubMessage> {
 
     private ChannelHandlerContext ctx;
 
