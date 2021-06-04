@@ -1,5 +1,7 @@
 package com.zakl.annotation;
 
+import com.zakl.constant.Constants;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -12,8 +14,14 @@ public @interface MqSubScribe {
 
 
     enum KeyTypeEnum {
-        LISTS,
-        SORTEDSET
+        LISTS(Constants.MQ_LIST_PREFIX),
+        SORTEDSET(Constants.MQ_SORTED_SET_PREFIX);
+
+        public String MQ_PREFIX;
+
+        KeyTypeEnum(String MQ_PREFIX) {
+            this.MQ_PREFIX = MQ_PREFIX;
+        }
     }
 
     /**

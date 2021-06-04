@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.zakl.config.ServerConfig.PUB_BUFFER_MAX_LIMIT;
+import static com.zakl.statusManage.StatusManager.remindDistributeThreadConsume;
 
 
 @Slf4j
@@ -89,7 +90,7 @@ public class PriorityPubMsgBufBufHandler implements PubMsgBufHandle {
                 }
             }
             //当前key处于可消费状态
-            MqKeyHandleStatusManager.remindConsume(keyName);
+            remindDistributeThreadConsume(keyName);
         }
         RedisUtil.syncSortedSetAdd(directToRedis.toArray(new MqMessage[0]));
     }

@@ -1,6 +1,7 @@
 package com.zakl.protocol;
 
 import cn.hutool.core.lang.Pair;
+import io.protostuff.Morph;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,7 @@ public class MqPubMessage implements Serializable {
      * value.key->score (>=0 表示当前数据分发到 MQ_SORTED_SET:key)
      * }
      */
+    @Morph
     private Map<String, List<Pair<Double, String>>> pubMessages;
 
 

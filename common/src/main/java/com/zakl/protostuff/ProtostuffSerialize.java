@@ -11,15 +11,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+@SuppressWarnings("all")
 public class ProtostuffSerialize implements RpcSerialize {
 
-
     @Override
-    public Object deserialize(InputStream input, Class msgClass) {
-        Schema schema = RuntimeSchema.getSchema(msgClass);
+    public <T> Object deserialize(InputStream input, Class<T> msgClass) throws IOException {
+        Schema<T> schema = RuntimeSchema.getSchema(msgClass);
         try {
             Object message = msgClass.newInstance();
-            ProtostuffIOUtil.mergeFrom(input, message, schema);
+            ProtostuffIOUtil.mergeFrom(input, ((T) message), schema);
             return message;
         } catch (InstantiationException | IOException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -27,10 +27,10 @@ public class ProtostuffSerialize implements RpcSerialize {
     }
 
     @Override
-    public void serialize(OutputStream output, Object object) {
+    public <T> void serialize(OutputStream output, T object) {
         LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
         try {
-            Schema schema = RuntimeSchema.getSchema(object.getClass());
+            Schema<T> schema = (Schema<T>) RuntimeSchema.getSchema(object.getClass());
             ProtostuffIOUtil.writeTo(output, object, schema, buffer);
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -38,5 +38,6 @@ public class ProtostuffSerialize implements RpcSerialize {
             buffer.clear();
         }
     }
+
 }
 

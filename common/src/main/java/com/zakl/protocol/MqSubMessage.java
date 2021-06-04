@@ -1,7 +1,7 @@
 package com.zakl.protocol;
 
-import cn.hutool.core.lang.Pair;
 import com.zakl.dto.MqMessage;
+import io.protostuff.Morph;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -61,9 +61,11 @@ public class MqSubMessage implements Serializable {
     public Integer clientWeight = -1;
 
 
+
     /**
      * ackMsgIdSet
      */
+    @Morph
     public Set<String> ackMsgIdSet;
 
     /**
@@ -75,18 +77,21 @@ public class MqSubMessage implements Serializable {
      * 订阅的通道(服务端主动推送)
      * only user for first register , null value when other time;
      */
+    @Morph
     private Set<String> activePushKeys;
 
     /**
-     * 订阅的通道(客户端主动调用)
+     * 订阅的通道(客户端主动调用) 需要配置 主动调用数量
      * only user for first register , null value when other time;
      */
+    @Morph
     private Set<String> passiveCallKeys;
 
 
     /**
      * messages From Server
      */
+    @Morph
     private List<MqMessage> mqMessages;
 
 

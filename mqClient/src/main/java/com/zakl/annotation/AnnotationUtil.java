@@ -1,10 +1,6 @@
 package com.zakl.annotation;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -25,34 +21,19 @@ import java.util.jar.JarFile;
  **/
 public class AnnotationUtil {
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        List<SubMethodInfo> values = scanAllConsumeMethod();
-        for (SubMethodInfo v : values) {
-            System.out.println(v);
-        }
-    }
 
-    @Data
-    @AllArgsConstructor
-    @ToString
-    static class SubMethodInfo {
-        MqSubScribe mqSubScribe;
-        Method method;
-    }
-
-    public static List<SubMethodInfo> scanAllConsumeMethod() throws IOException, ClassNotFoundException {
+    public static <T> List<AnnotationMethodInfo<T>> scanAnnotationMethods(Class<T> annotationType, String packageName, boolean childPackage) throws IOException, ClassNotFoundException {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        List<String> classNames = getClassNames(true, "com.zakl.container");
-        List<SubMethodInfo> ret = new ArrayList<>();
+        List<String> classNames = getClassNames(childPackage, packageName);
+        List<AnnotationMethodInfo<T>> ret = new ArrayList<>();
         for (String className : classNames) {
             Class<?> aClass = loader.loadClass(className);
             Method[] declaredMethods = aClass.getDeclaredMethods();
 
             for (Method method : declaredMethods) {
                 for (Annotation annotation : method.getAnnotations()) {
-                    if (annotation.annotationType().isAssignableFrom(MqSubScribe.class)) {
-                        MqSubScribe mss = (MqSubScribe) annotation;
-                        ret.add(new SubMethodInfo(mss, method));
+                    if (annotation.annotationType().isAssignableFrom(annotationType)) {
+                        ret.add(new AnnotationMethodInfo<>(((T) annotation), method));
                         break;
                     }
                 }
@@ -111,9 +92,9 @@ public class AnnotationUtil {
         String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"));
         try {
             JarFile jarFile = new JarFile(jarFilePath);
-            Enumeration<JarEntry> entrys = jarFile.entries();
-            while (entrys.hasMoreElements()) {
-                JarEntry jarEntry = entrys.nextElement();
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry jarEntry = entries.nextElement();
                 String entryName = jarEntry.getName();
                 if (entryName.endsWith(".class")) {
                     String packagePath = packageName.replaceAll("\\.", "/");

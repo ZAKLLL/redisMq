@@ -3,6 +3,7 @@ package com.zakl.mqhandler;
 import cn.hutool.core.lang.Pair;
 import com.zakl.config.RedisConfig;
 import com.zakl.dto.MqMessage;
+import com.zakl.util.MqHandleUtil;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.ScoredValue;
 import io.lettuce.core.ZAddArgs;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.zakl.constant.Constants.MIN_SCORE;
-import static com.zakl.mqhandler.MqHandleUtil.convertMqMessageToJsonDate;
+import static com.zakl.util.MqHandleUtil.convertMqMessageToJsonDate;
 
 @Slf4j
 @SuppressWarnings("all")

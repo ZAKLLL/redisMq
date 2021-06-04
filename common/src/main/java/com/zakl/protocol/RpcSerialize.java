@@ -7,8 +7,8 @@ import java.io.OutputStream;
 
 public interface RpcSerialize {
 
-    void serialize(OutputStream output, Object object) throws IOException;
+     <T> void serialize(OutputStream output, T object) throws IOException;
 
-    Object deserialize(InputStream input, Class<?> msgClass) throws IOException;
+     <T> Object deserialize(InputStream input, Class<T> msgClass) throws IOException;
 }
 

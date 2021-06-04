@@ -6,7 +6,7 @@ import com.zakl.protocol.MqPubMessage;
 /**
  * ACK 处理器
  */
-public class AckHandler {
+public class AckClientHandler {
 
 
     /**

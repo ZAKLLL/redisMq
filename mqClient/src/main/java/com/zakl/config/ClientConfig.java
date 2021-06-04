@@ -37,6 +37,11 @@ public class ClientConfig implements Serializable {
      */
     private static final Integer mqSubPort;
 
+    /**
+     * consume method package
+     */
+    private static final String consumePackage;
+
 
     static {
         mqPubPort = ConfigUtil.getInstance().getIntValue("server.mqPubPort");
@@ -45,9 +50,11 @@ public class ClientConfig implements Serializable {
 
         serverIp = ConfigUtil.getInstance().getStringValue("server.ip");
 
+        consumePackage = ConfigUtil.getInstance().getStringValue("client.consumePackage");
+
         log.info(
-                "config init serverIp{}, mqPubPort {}, mqSubPort {}",
-                serverIp, mqPubPort, mqSubPort);
+                "config init serverIp{}, mqPubPort {}, mqSubPort {}, consumePackage {}",
+                serverIp, mqPubPort, mqSubPort, consumePackage);
     }
 
     public static String getServerIp() {
@@ -60,5 +67,9 @@ public class ClientConfig implements Serializable {
 
     public static Integer getMqSubPort() {
         return mqSubPort;
+    }
+
+    public static String getConsumePackage() {
+        return consumePackage;
     }
 }

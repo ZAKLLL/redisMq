@@ -1,8 +1,9 @@
 package com.zakl.statusManage;
 
 import cn.hutool.core.lang.Pair;
+import com.zakl.ack.AckHandleThreadManager;
 import com.zakl.dto.MqMessage;
-import com.zakl.mqhandler.MqHandleUtil;
+import com.zakl.util.MqHandleUtil;
 import com.zakl.mqhandler.PriorityPubMsgBufBufHandler;
 import com.zakl.mqhandler.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +12,16 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.zakl.constant.Constants.*;
-import static com.zakl.mqhandler.MqHandleUtil.checkIfSortedSet;
+import static com.zakl.mqhandler.KeyMsgDistributeThread.registerMsgDistributor;
+import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 import static com.zakl.mqhandler.RedisUtil.syncKeys;
 import static com.zakl.statusManage.MqKeyHandleStatusManager.*;
 
@@ -48,10 +53,10 @@ public class StatusManager {
         resetKeyStatus(keyName, new AtomicBoolean(true));
         if (checkIfSortedSet(keyName)) {
             log.info("start register new sorted Set in redis");
-            registerNewSortedSet(keyName);
+            registerNewSortedSetInRedis(keyName);
             log.info("start register new sorted Set in redis succeed ");
         }
-
+        keyMessagesBufMap.put(keyName, new LinkedBlockingDeque<>());
         if (clients.length > 0) {
             PriorityBlockingQueue<SubClientInfo> clientPq = new PriorityBlockingQueue<>(16, subClientComparator);
             keyClientsMap.put(keyName, clientPq);
@@ -61,6 +66,8 @@ public class StatusManager {
                 clientPq.add(client);
             }
         }
+
+        registerMsgDistributor(keyName);
     }
 
     /**
@@ -95,6 +102,10 @@ public class StatusManager {
                 keyClientsMap.put(key, new PriorityBlockingQueue<>(16, subClientComparator));
 
                 resetKeyStatus(key, new AtomicBoolean(true));
+
+                keyMessagesBufMap.put(key, new LinkedBlockingDeque<>());
+
+                registerMsgDistributor(key);
             }
             //ack key
             else if (key.equals(ACK_SET_KEY)) {
@@ -118,7 +129,6 @@ public class StatusManager {
         }
         log.info("init keys info from redis succeed");
 
-
         INIT_FROM_REDIS = true;
 
     }
@@ -126,14 +136,49 @@ public class StatusManager {
 
     /**
      * register a new SortedSet to Redis Server
+     *
      * @param channelName
      */
-    public static void registerNewSortedSet(String channelName) {
+    public static void registerNewSortedSetInRedis(String channelName) {
 
         PriorityPubMsgBufBufHandler.registerNewSortedSetBuf(channelName);
         RedisUtil.syncSortedSetAdd(channelName, new Pair<>(MIN_SCORE, KEY_HOLDER + channelName));
     }
 
+
+    /**
+     * remind key's consume thread can continue consume
+     *
+     * @param keyName
+     */
+    public static void remindDistributeThreadConsume(String keyName) {
+        Condition condition = keyHandleConditionMap.get(keyName);
+        Lock lock = keyHandleLockMap.get(keyName);
+        AtomicBoolean flag = canConsumeStatusMap.get(keyName);
+        //if current state is can't consume(key is empty or client queue is empty)
+        if (!flag.get()) {
+            try {
+                lock.lock();
+                condition.signal();
+                flag.set(true);
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    public static void suspendDistributeThread(String keyName) {
+        AtomicBoolean canConsumeFlag = MqKeyHandleStatusManager.canConsumeStatusMap.get(keyName);
+        canConsumeFlag.set(false);
+    }
+
+    public static void cleanUpOffLiveSubClient(SubClientInfo clientInfo, String... keys) {
+        log.info("subClient: {} is offline,clean its status", clientInfo);
+        for (String key : keys) {
+            keyClientsMap.get(key).remove(clientInfo);
+        }
+        AckHandleThreadManager.removeAckHandleThread(clientInfo);
+    }
 
 }
 

@@ -1,9 +1,8 @@
-package com.zakl.mqhandler;
+package com.zakl.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.zakl.constant.Constants;
 import com.zakl.dto.MqMessage;
-import com.zakl.util.JsonUtils;
 
 /**
  * @author ZhangJiaKui

@@ -40,7 +40,7 @@ public class MqKeyHandleStatusManager {
 
 
     /**
-     * if key has msg let thread consume
+     * if key has msg && has client to let thread consume
      */
     public final static Map<String, AtomicBoolean> canConsumeStatusMap = new ConcurrentHashMap<>();
 
@@ -50,23 +50,6 @@ public class MqKeyHandleStatusManager {
      */
     public final static Map<String, LinkedBlockingDeque<MqMessage>> keyMessagesBufMap = new ConcurrentHashMap<>();
 
-    /**
-     * remind key's consume thread can continue consume
-     *
-     * @param keyName
-     */
-    public static void remindConsume(String keyName) {
-        Condition condition = keyHandleConditionMap.get(keyName);
-        Lock lock = keyHandleLockMap.get(keyName);
-        AtomicBoolean flag = canConsumeStatusMap.get(keyName);
-        if (flag.get()) {
-            try {
-                lock.lock();
-                condition.signal();
-            } finally {
-                lock.unlock();
-            }
-        }
-    }
+
 
 }

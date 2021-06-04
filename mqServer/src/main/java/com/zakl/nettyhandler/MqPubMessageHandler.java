@@ -3,9 +3,7 @@ package com.zakl.nettyhandler;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
 import com.zakl.mqhandler.FifoPubMsgBufBufHandler;
-import com.zakl.mqhandler.MqHandleUtil;
 import com.zakl.statusManage.PubClientManager;
-import com.zakl.constant.Constants;
 import com.zakl.dto.MqMessage;
 import com.zakl.mqhandler.PriorityPubMsgBufBufHandler;
 import com.zakl.mqhandler.PubMsgBufHandle;
@@ -18,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.zakl.mqhandler.MqHandleUtil.checkIfKeyValid;
-import static com.zakl.mqhandler.MqHandleUtil.checkIfSortedSet;
+import static com.zakl.util.MqHandleUtil.checkIfKeyValid;
+import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 
 /**
  * @author ZhangJiaKui

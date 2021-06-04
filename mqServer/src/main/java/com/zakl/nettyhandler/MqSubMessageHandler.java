@@ -1,7 +1,6 @@
 package com.zakl.nettyhandler;
 
 import com.zakl.ack.AckCallBack;
-import com.zakl.ack.AckHandleThreadManager;
 import com.zakl.ack.AckResponseHandler;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
@@ -21,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.zakl.statusManage.MqKeyDistributeTypeManager.activePushKeys;
 import static com.zakl.statusManage.MqKeyDistributeTypeManager.passiveCallKeys;
 import static com.zakl.statusManage.MqKeyHandleStatusManager.clientIdMap;
+import static com.zakl.statusManage.StatusManager.cleanUpOffLiveSubClient;
+import static com.zakl.statusManage.StatusManager.remindDistributeThreadConsume;
 
 /**
  * @author ZhangJiaKui
@@ -89,14 +90,18 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
         for (final String keyName : msg.getAllKeys()) {
             if (!MqKeyHandleStatusManager.keyClientsMap.containsKey(keyName)) {
                 StatusManager.initNewKey(keyName, subClientInfo);
+            } else {
+                MqKeyHandleStatusManager.keyClientsMap.get(keyName).offer(subClientInfo);
             }
+            //remind distribute thread work
+            remindDistributeThreadConsume(keyName);
         }
     }
 
     private void cleanSubClientInfo(ChannelHandlerContext ctx) {
         SubClientInfo clientInfo = ctxClientMap.remove(ctx);
         log.info("remove offLine subClient: {},ctx: {}", clientInfo, ctx);
-        AckHandleThreadManager.removeAckHandleThread(clientInfo);
+        cleanUpOffLiveSubClient(clientInfo);
     }
 
 

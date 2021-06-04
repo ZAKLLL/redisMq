@@ -2,9 +2,7 @@ package com.zakl.mqhandler;
 
 import cn.hutool.core.collection.ListUtil;
 import com.zakl.ack.AckCallBack;
-import com.zakl.ack.AckHandleThread;
 import com.zakl.ack.AckHandleThreadManager;
-import com.zakl.ack.AckResponseHandler;
 import com.zakl.statusManage.SubClientInfo;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.dto.MqMessage;
@@ -14,8 +12,11 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.zakl.mqhandler.MqHandleUtil.convertRedisStringToMqMessage;
+import static com.zakl.statusManage.StatusManager.cleanUpOffLiveSubClient;
+import static com.zakl.statusManage.StatusManager.suspendDistributeThread;
+import static com.zakl.util.MqHandleUtil.convertRedisStringToMqMessage;
 
 @Slf4j
 public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
@@ -61,7 +62,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
             // redis 与 buf 区都无数据
             msgToDistribute = null;
         }
-        doDistribute(msgToDistribute);
+        doDistribute(msgToDistribute, keyName);
     }
 
 
@@ -69,13 +70,22 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
      * 分发消息并且等到Ack响应之后,才会丢弃该信息
      *
      * @param mqMessage
+     * @param keyName
      */
-    private static void doDistribute(MqMessage mqMessage) {
-        if (mqMessage == null) return;
+    private static void doDistribute(MqMessage mqMessage, String keyName) {
+        if (mqMessage == null) {
+            log.info("key: {} is empty, suspend corresponding msgDistribute thread", keyName);
+            suspendDistributeThread(keyName);
+            return;
+        }
         PriorityBlockingQueue<SubClientInfo> subClientInfos = MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey());
 
         if (subClientInfos.isEmpty()) {
-            throw new RuntimeException("无法正常获取连接key对应的subClient");
+            log.info("key: {} 's subClient queue is empty,mqMessage:{} will push back to Redis", mqMessage.getKey(), mqMessage);
+            suspendDistributeThread(keyName);
+            //no client, push msg Back to redis;
+            RedisUtil.syncSortedSetAdd(mqMessage);
+            return;
         }
 
         SubClientInfo subClientInfo = subClientInfos.poll();
@@ -84,6 +94,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
             log.info("subClient {} 离线,channel 信息{}", clientId, subClientInfo.getContext());
             //退回到redis
             RedisUtil.syncSortedSetAdd(mqMessage);
+            cleanUpOffLiveSubClient(subClientInfo, keyName);
             return;
         }
         ChannelHandlerContext ctx = subClientInfo.getContext();
