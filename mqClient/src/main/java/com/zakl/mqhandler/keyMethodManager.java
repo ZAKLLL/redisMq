@@ -1,74 +1,43 @@
-package com.zakl.nettyhandler;
+package com.zakl.mqhandler;
 
-import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
 import com.zakl.annotation.AnnotationMethodInfo;
 import com.zakl.annotation.AnnotationUtil;
 import com.zakl.annotation.MqSubScribe;
 import com.zakl.config.ClientConfig;
+import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.util.MqHandleUtil;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.mqtt.MqttPublishMessage;
+import com.zakl.util.ReflectionUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.zakl.protocol.MqSubMessage.TYPE_SUBSCRIBE;
 
 /**
  * @author ZhangJiaKui
- * @classname MqSubMessageHandler
+ * @classname ClientRegister
  * @description TODO
- * @date 5/27/2021 4:26 PM
+ * @date 6/4/2021 3:57 PM
  */
 @Slf4j
-public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSubMessage> {
+public class keyMethodManager {
+    public static final Map<String, AnnotationMethodInfo<MqSubScribe>> keyConsumeMethodsMap = new HashMap<>();
 
 
+    private static final Set<String> activePushKeys = new HashSet<>();
 
-    private static final Map<String, AnnotationMethodInfo<MqSubScribe>> keyConsumeMethodsMap = new HashMap<>();
+    private static final Set<String> passiveCallKeys = new HashSet<>();
 
-
-    private static Set<String> activePushKeys = new HashSet<>();
-
-    private static Set<String> passiveCallKeys = new HashSet<>();
-
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, MqSubMessage msg) throws Exception {
-        log.info(msg.toString());
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
-                + "channelActive");
-
+    public static void main(String[] args) {
         MqSubMessage mqSubMessage = genMqSubscribeMsg();
-        ctx.writeAndFlush(mqSubMessage);
-        super.channelActive(ctx);
-    }
-
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
-                + "channelInactive");
-        super.channelInactive(ctx);
-    }
-
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
+        System.out.println(mqSubMessage);
     }
 
     @SneakyThrows
@@ -79,15 +48,20 @@ public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
         fillTargetObjet(annotationMethodInfos);
         for (AnnotationMethodInfo<MqSubScribe> annotationMethodInfo : annotationMethodInfos) {
             MqSubScribe annotation = annotationMethodInfo.getAnnotation();
+            Method method = annotationMethodInfo.getMethod();
+
+            checkConsumeMethodParam(annotation, method);
+
             String[] keys = annotation.keys();
+
             for (String key : keys) {
-                if (activePushKeys.contains(key) || passiveCallKeys.contains(key)) {
+                if (!MqHandleUtil.checkIfKeyValid(key)) {
+                    key = annotation.keyType().MQ_PREFIX + key;
+                }
+                if (keyConsumeMethodsMap.containsKey(key)) {
                     String errMsg = "can not reSubScribe the same Key ";
                     log.error(errMsg);
                     throw new RuntimeException(errMsg);
-                }
-                if (!MqHandleUtil.checkIfKeyValid(key)) {
-                    key = annotation.keyType().MQ_PREFIX + key;
                 }
                 if (annotation.activePush()) {
                     activePushKeys.add(key);
@@ -131,6 +105,45 @@ public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
                 annotationMethodInfo.setTargetObject(target);
             }
             //todo 兼容Springboot
+        }
+    }
+
+    /**
+     * checkConsumeMethodParam if meet the requirements
+     *
+     * @param mqSubScribe
+     * @param method
+     */
+    private static void checkConsumeMethodParam(MqSubScribe mqSubScribe, Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        boolean flag = false;
+        if (mqSubScribe.autoAck() && parameterTypes.length == 1) {
+            if (parameterTypes[0].isAssignableFrom(List.class)) {
+                flag = true;
+            }
+        } else if (!mqSubScribe.autoAck() && parameterTypes.length == 2) {
+            if (parameterTypes[0].isAssignableFrom(List.class) && parameterTypes[1].isAssignableFrom(AckClientHandler.class)) {
+                flag = true;
+            }
+        }
+        if (!flag) throw new RuntimeException("illegal paramException");
+    }
+
+
+    public static void disTributeMsgToConsumeMethod(MqSubMessage msg) {
+        Map<String, List<MqMessage>> keyMsgsMap = msg.getMqMessages().stream().collect(Collectors.groupingBy(MqMessage::getKey));
+        for (String key : keyMsgsMap.keySet()) {
+            List<MqMessage> mqMessages = keyMsgsMap.get(key);
+            AnnotationMethodInfo<MqSubScribe> annotationMethodInfo = keyConsumeMethodsMap.get(key);
+            MqSubScribe annotation = annotationMethodInfo.getAnnotation();
+            Method method = annotationMethodInfo.getMethod();
+            Object object = annotationMethodInfo.getTargetObject();
+            if (annotation.autoAck()) {
+                new AckClientHandler(MqSubMessage.TYPE_ACK_AUTO).confirm(mqMessages.toArray(new MqMessage[0]));
+                ReflectionUtils.reflectInvoke(object, method, new Object[]{mqMessages});
+            } else {
+                ReflectionUtils.reflectInvoke(object, method, new Object[]{mqMessages, new AckClientHandler(MqSubMessage.TYPE_ACK_MANUAL)});
+            }
         }
     }
 }

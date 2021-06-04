@@ -1,4 +1,4 @@
-package com.zakl.nettyhandler;
+package com.zakl.nettyhandle;
 
 import com.zakl.ack.AckCallBack;
 import com.zakl.ack.AckResponseHandler;
@@ -109,6 +109,10 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
         for (String msgId : ackMsgIdSet) {
             log.info("messageId:{} receive Ack ,type:{}", msgId, type);
             AckCallBack ackCallBack = AckResponseHandler.ackCallBackMap.get(msgId);
+            if (ackCallBack == null) {
+                log.info("not ackCallBack for current msgId: {}", msgId);
+                return;
+            }
             ackCallBack.over(type);
         }
     }

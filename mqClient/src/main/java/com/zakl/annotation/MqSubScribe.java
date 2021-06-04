@@ -14,7 +14,7 @@ public @interface MqSubScribe {
 
 
     enum KeyTypeEnum {
-        LISTS(Constants.MQ_LIST_PREFIX),
+        LIST(Constants.MQ_LIST_PREFIX),
         SORTEDSET(Constants.MQ_SORTED_SET_PREFIX);
 
         public String MQ_PREFIX;

@@ -1,9 +1,8 @@
-package com.zakl.nettyhandler;
+package com.zakl.nettyhandle;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
-import com.zakl.constant.Constants;
 import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;

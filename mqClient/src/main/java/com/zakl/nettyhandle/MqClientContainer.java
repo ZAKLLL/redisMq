@@ -1,8 +1,9 @@
-package com.zakl.container;
+package com.zakl.nettyhandle;
 
 import com.zakl.config.ClientConfig;
-import com.zakl.nettyhandler.MqPubMessageClientHandler;
-import com.zakl.nettyhandler.MqSubMessageClientHandler;
+import com.zakl.container.Container;
+import com.zakl.nettyhandle.MqPubMessageClientHandler;
+import com.zakl.nettyhandle.MqSubMessageClientHandler;
 import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.protostuff.ProtostuffCodecUtil;
@@ -14,6 +15,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 
@@ -23,6 +25,7 @@ import java.net.InetSocketAddress;
  * @description TODO
  * @date 5/27/2021 4:11 PM
  */
+@Slf4j
 public class MqClientContainer implements Container {
     private final EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
 
@@ -38,6 +41,7 @@ public class MqClientContainer implements Container {
     @Override
     public void start() {
 
+        log.info("start a {} client", isPub ? "publish" : "subscribe");
         Bootstrap b = new Bootstrap();
         b.group(eventLoopGroup).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true);
         b.handler(new ChannelInitializer<NioSocketChannel>() {
@@ -60,10 +64,5 @@ public class MqClientContainer implements Container {
     @Override
     public void stop() {
         eventLoopGroup.shutdownGracefully();
-    }
-
-    public static void main(String[] args) {
-//        new MqClientContainer(true).start();
-        new MqClientContainer(false).start();
     }
 }

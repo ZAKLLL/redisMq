@@ -1,4 +1,4 @@
-package com.zakl.nettyhandler;
+package com.zakl.nettyhandle;
 
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
