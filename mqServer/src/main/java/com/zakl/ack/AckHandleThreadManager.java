@@ -44,6 +44,10 @@ public class AckHandleThreadManager {
 
     public static void removeAckHandleThread(SubClientInfo subClientInfo) {
         AckHandleThread ackHandleThread = AckHandleThreadMap.remove(subClientInfo.getClientId());
+        if (ackHandleThread == null) {
+            log.error("current client: {} doesn't exist ackHandleThread", subClientInfo);
+            return;
+        }
         ackHandleThread.forceShutDown();
     }
 }

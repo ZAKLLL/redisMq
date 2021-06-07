@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PubClientManager {
 
@@ -14,7 +15,7 @@ public class PubClientManager {
     private static final PubClientManager instance = new PubClientManager();
 
 
-    public Map<String, ChannelHandlerContext> pubClientMap = new HashMap<>();
+    public Map<String, ChannelHandlerContext> pubClientMap = new ConcurrentHashMap<>();
 
 
     public static PubClientManager getInstance() {

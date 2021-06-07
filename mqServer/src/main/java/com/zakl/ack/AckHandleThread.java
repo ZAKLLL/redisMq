@@ -29,6 +29,7 @@ public class AckHandleThread extends Thread {
 
     private final Condition condition;
 
+    private Thread ackHandleRealThread;
 
     public AckHandleThread(SubClientInfo subClientInfo) {
         if (subClientInfo == null) {
@@ -36,11 +37,11 @@ public class AckHandleThread extends Thread {
             log.error(errorMsg);
             throw new RuntimeException("need subClientInfo to create a new AckHandleThread!");
         }
-        super.setName(THREAD_NAME_PREFIX + subClientInfo.getClientId());
         lock = new ReentrantLock();
         condition = lock.newCondition();
         ackCallBackRef = new AtomicReference<>(null);
         this.subClientInfo = subClientInfo;
+        super.setName(THREAD_NAME_PREFIX + subClientInfo.getClientId());
     }
 
     public void submitNewAckHandleRequest(AckCallBack ackCallBack) {
@@ -59,13 +60,22 @@ public class AckHandleThread extends Thread {
         }
     }
 
+
     public void forceShutDown() {
+        log.info("forceShutDown current achHandleThread: {}", this.getName());
         subClientInfo.setAlive(false);
-        this.interrupt();
+        if (ackHandleRealThread == null) {
+            String errorMsg = String.format("ackHandleRealThread is null ,maybe current thread: %s didn't submit to ThreadPool successFully", this.getName());
+            log.error(errorMsg);
+            throw new RuntimeException(errorMsg);
+        }
+        //使用执行线程进行中断处理
+        ackHandleRealThread.interrupt();
     }
 
     @Override
     public void run() {
+        ackHandleRealThread = Thread.currentThread();
         while (true) {
             lock.lock();
             try {
@@ -75,7 +85,6 @@ public class AckHandleThread extends Thread {
                 }
                 condition.await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 log.error("AckHandleThread be Interrupted", e);
                 break;
             } finally {

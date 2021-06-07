@@ -12,7 +12,7 @@ import java.util.List;
 public class MqSubDemo extends TemplateConsumer {
 
 
-    @MqSubScribe(keys = {"k1", "k2"})
+    @MqSubScribe(keys = {"k1"})
     @Override
     public void consumeWithAutoAck(List<MqMessage> msgs) {
         for (MqMessage msg : msgs) {
@@ -20,7 +20,7 @@ public class MqSubDemo extends TemplateConsumer {
         }
     }
 
-    @MqSubScribe(keys = {"k3"}, autoAck = false)
+//    @MqSubScribe(keys = {"k3"}, autoAck = false)
     @Override
     public void consumeWithManualAck(List<MqMessage> msgs, AckClientHandler ackHandler) {
         super.consumeWithManualAck(msgs, ackHandler);

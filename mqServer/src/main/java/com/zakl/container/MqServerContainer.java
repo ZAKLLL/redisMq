@@ -25,9 +25,10 @@ import java.util.Map;
 @SuppressWarnings("all")
 public class MqServerContainer implements Container {
 
+    private final NioEventLoopGroup serverBossGroup;
+    
     private final NioEventLoopGroup serverWorkerGroup;
 
-    private final NioEventLoopGroup serverBossGroup;
 
 
     private final Class<?> msgType;
