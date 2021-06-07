@@ -1,7 +1,7 @@
 package com.zakl.statusManage;
 
 import cn.hutool.core.lang.Pair;
-import com.zakl.ack.AckHandleThreadManager;
+import com.zakl.ack.AckHandlerManager;
 import com.zakl.dto.MqMessage;
 import com.zakl.util.MqHandleUtil;
 import com.zakl.mqhandler.PriorityPubMsgBufBufHandler;
@@ -177,7 +177,7 @@ public class StatusManager {
         for (String key : keys) {
             keyClientsMap.get(key).remove(clientInfo);
         }
-        AckHandleThreadManager.removeAckHandleThread(clientInfo);
+        AckHandlerManager.removeAckHandleThread(clientInfo);
     }
 
 }

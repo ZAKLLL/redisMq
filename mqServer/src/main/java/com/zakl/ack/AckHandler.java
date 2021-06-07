@@ -16,10 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @desc todo
  **/
 @Slf4j
-public class AckHandleThread extends Thread {
+public class AckHandler implements Runnable {
 
-
-    public final static String THREAD_NAME_PREFIX = "thread:SubClientMsgDistribute:";
 
     private final AtomicReference<AckCallBack> ackCallBackRef;
 
@@ -31,7 +29,8 @@ public class AckHandleThread extends Thread {
 
     private Thread ackHandleRealThread;
 
-    public AckHandleThread(SubClientInfo subClientInfo) {
+
+    public AckHandler(SubClientInfo subClientInfo) {
         if (subClientInfo == null) {
             String errorMsg = "need subClientInfo to create a new AckHandleThread!";
             log.error(errorMsg);
@@ -41,7 +40,6 @@ public class AckHandleThread extends Thread {
         condition = lock.newCondition();
         ackCallBackRef = new AtomicReference<>(null);
         this.subClientInfo = subClientInfo;
-        super.setName(THREAD_NAME_PREFIX + subClientInfo.getClientId());
     }
 
     public void submitNewAckHandleRequest(AckCallBack ackCallBack) {
@@ -62,10 +60,10 @@ public class AckHandleThread extends Thread {
 
 
     public void forceShutDown() {
-        log.info("forceShutDown current achHandleThread: {}", this.getName());
+        log.info("forceShutDown current client: {} 's achHandleThread", subClientInfo.getClientId());
         subClientInfo.setAlive(false);
         if (ackHandleRealThread == null) {
-            String errorMsg = String.format("ackHandleRealThread is null ,maybe current thread: %s didn't submit to ThreadPool successFully", this.getName());
+            String errorMsg = String.format("ackHandleRealThread is null ,maybe current thread: %s didn't submit to ThreadPool successFully", subClientInfo.getClientId());
             log.error(errorMsg);
             throw new RuntimeException(errorMsg);
         }

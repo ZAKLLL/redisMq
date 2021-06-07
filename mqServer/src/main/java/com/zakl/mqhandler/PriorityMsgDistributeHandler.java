@@ -2,7 +2,7 @@ package com.zakl.mqhandler;
 
 import cn.hutool.core.collection.ListUtil;
 import com.zakl.ack.AckCallBack;
-import com.zakl.ack.AckHandleThreadManager;
+import com.zakl.ack.AckHandlerManager;
 import com.zakl.statusManage.SubClientInfo;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.dto.MqMessage;
@@ -12,7 +12,6 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.zakl.statusManage.StatusManager.cleanUpOffLiveSubClient;
 import static com.zakl.statusManage.StatusManager.suspendDistributeThread;
@@ -108,7 +107,7 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
 
         // ack handle non-blocking
         AckCallBack ackCallBack = new AckCallBack(mqMessage);
-        AckHandleThreadManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
+        AckHandlerManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
 
     }
 
