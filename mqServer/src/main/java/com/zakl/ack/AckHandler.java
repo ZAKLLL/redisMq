@@ -55,7 +55,6 @@ public class AckHandler implements Runnable {
         String messageId = ackCallBack.getMqMessage().getMessageId();
         AckResponseHandler.ackCallBackMap.put(messageId, ackCallBack);
 
-
         lock.lock();
         try {
             ackCallBackQueue.offer(ackCallBack);

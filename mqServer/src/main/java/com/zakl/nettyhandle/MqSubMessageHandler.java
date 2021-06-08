@@ -2,25 +2,23 @@ package com.zakl.nettyhandle;
 
 import com.zakl.ack.AckCallBack;
 import com.zakl.ack.AckResponseHandler;
-import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
-import com.zakl.redisinteractive.RedisUtil;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.statusManage.StatusManager;
 import com.zakl.statusManage.SubClientInfo;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.zakl.msgdistribute.MqMsgPassiveCallHandler.handlePassiveCall;
-import static com.zakl.statusManage.MqKeyHandleStatusManager.*;
+import static com.zakl.statusManage.MqKeyHandleStatusManager.clientIdMap;
 import static com.zakl.statusManage.StatusManager.cleanUpOffLiveSubClient;
 import static com.zakl.statusManage.StatusManager.remindDistributeThreadConsume;
 
@@ -45,7 +43,7 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
                 break;
             }
             case MqSubMessage.PASSIVE_CALL: {
-                handlePassiveCall(ctx, msg);
+                handlePassiveCall(ctx, msg,ctxClientMap.get(ctx));
                 break;
             }
             case MqSubMessage.TYPE_ACK_AUTO:

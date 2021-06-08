@@ -1,7 +1,6 @@
 package com.zakl;
 
 import cn.hutool.core.lang.Pair;
-import com.zakl.constant.Constants;
 import com.zakl.dto.MqMessage;
 import com.zakl.nettyhandle.MqClientContainer;
 import com.zakl.passivecall.PassiveCaller;

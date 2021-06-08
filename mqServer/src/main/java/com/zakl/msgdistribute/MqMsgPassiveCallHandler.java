@@ -1,10 +1,13 @@
 package com.zakl.msgdistribute;
 
 import cn.hutool.core.lang.Pair;
+import com.zakl.ack.AckCallBack;
+import com.zakl.ack.AckHandlerManager;
 import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.redisinteractive.RedisUtil;
 import com.zakl.statusManage.StatusManager;
+import com.zakl.statusManage.SubClientInfo;
 import com.zakl.util.MqHandleUtil;
 import io.lettuce.core.ScoredValue;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,7 +18,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import static com.zakl.protocol.MqSubMessage.TYPE_MQ_MESSAGE_ACTIVE_PUSH;
 import static com.zakl.protocol.MqSubMessage.TYPE_MQ_MESSAGE_PASSIVE_CALL;
 import static com.zakl.statusManage.MqKeyHandleStatusManager.keyClientsMap;
 
@@ -31,7 +33,7 @@ public class MqMsgPassiveCallHandler {
 
     private final static PubMsgBufBufHandler bufBufHandler = PubMsgBufBufHandler.getInstance();
 
-    public static void handlePassiveCall(ChannelHandlerContext ctx, MqSubMessage msg) {
+    public static void handlePassiveCall(ChannelHandlerContext ctx, MqSubMessage msg, SubClientInfo subClientInfo) {
         List<MqMessage> mqMessages = new ArrayList<>();
         List<Pair<String, Integer>> passiveCalls = msg.getPassiveCallKeys();
         for (Pair<String, Integer> passiveCall : passiveCalls) {
@@ -52,9 +54,11 @@ public class MqMsgPassiveCallHandler {
         responseMqMsg.setPassiveCallId(msg.getPassiveCallId());
         responseMqMsg.setMqMessages(mqMessages);
         ctx.writeAndFlush(responseMqMsg);
-        //todo ack handle
-
-
+        //todo 验证主动调用ack
+        for (MqMessage mqMessage : mqMessages) {
+            AckCallBack ackCallBack = new AckCallBack(mqMessage);
+            AckHandlerManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
+        }
     }
 
     private static List<MqMessage> fifoMsgPassiveCallHandle(String keyName, Integer cnt) {
