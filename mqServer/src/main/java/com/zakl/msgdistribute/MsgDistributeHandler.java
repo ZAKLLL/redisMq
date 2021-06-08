@@ -1,12 +1,13 @@
-package com.zakl.mqhandler;
+package com.zakl.msgdistribute;
 
 import cn.hutool.core.collection.ListUtil;
 import com.zakl.ack.AckCallBack;
 import com.zakl.ack.AckHandlerManager;
-import com.zakl.statusManage.SubClientInfo;
-import com.zakl.statusManage.MqKeyHandleStatusManager;
-import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
+import com.zakl.redisinteractive.RedisUtil;
+import com.zakl.dto.MqMessage;
+import com.zakl.statusManage.MqKeyHandleStatusManager;
+import com.zakl.statusManage.SubClientInfo;
 import io.lettuce.core.ScoredValue;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -18,20 +19,19 @@ import static com.zakl.statusManage.StatusManager.suspendDistributeThread;
 import static com.zakl.util.MqHandleUtil.convertRedisStringToMqMessage;
 
 @Slf4j
-public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
+public class MsgDistributeHandler  {
 
-    private final static PriorityMsgDistributeHandler instance = new PriorityMsgDistributeHandler();
+    private final static MsgDistributeHandler instance = new MsgDistributeHandler();
 
 
-    private PriorityMsgDistributeHandler() {
+    private MsgDistributeHandler() {
     }
 
 
-    public static MqMsgDistributeHandle getInstance() {
+    public static MsgDistributeHandler getInstance() {
         return instance;
     }
 
-    @Override
     public void distribute(MqMessage bufMsg, String keyName) {
         MqMessage msgToDistribute;
         ScoredValue<String> scoreValue = RedisUtil.syncSortedSetPopMax(keyName);
@@ -65,12 +65,6 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
     }
 
 
-    /**
-     * 分发消息并且等到Ack响应之后,才会丢弃该信息
-     *
-     * @param mqMessage
-     * @param keyName
-     */
     private static void doDistribute(MqMessage mqMessage, String keyName) {
         if (mqMessage == null) {
             log.info("key: {} is empty, suspend corresponding msgDistribute thread", keyName);
@@ -110,5 +104,4 @@ public class PriorityMsgDistributeHandler implements MqMsgDistributeHandle {
         AckHandlerManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
 
     }
-
 }

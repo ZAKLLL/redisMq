@@ -1,4 +1,4 @@
-package com.zakl.mqhandler;
+package com.zakl.redisinteractive;
 
 import cn.hutool.core.lang.Pair;
 import com.zakl.config.RedisConfig;
@@ -64,9 +64,13 @@ public class RedisUtil {
             scoreMembers[index++] = member.getKey();
             scoreMembers[index++] = member.getValue();
         }
-        StatefulRedisConnection<String, String> connection = getConnection();
-        connection.sync().zadd(key, nx, scoreMembers);
-        returnConnection(connection);
+        new RedisCommandRunner<Object>(){
+            @Override
+            Object exec() {
+                connection.sync().zadd(key, nx, scoreMembers);
+                return super.exec();
+            }
+        };
     }
 
 
@@ -85,6 +89,20 @@ public class RedisUtil {
             }
             syncSortedSetAdd(key, members);
         }
+    }
+
+
+
+    public static void syncSortedSetAdd(String key,MqMessage... mqMessages) {
+
+            Pair<Double, String>[] members = new Pair[mqMessages.length];
+            for (int i = 0; i < mqMessages.length; i++) {
+                MqMessage msg = mqMessages[i];
+                double score = msg.getWeight();
+                String data = String.format("uuid:%s\n%s", msg.getMessageId(), msg.getMessage());
+                members[i] = new Pair<>(score, data);
+            }
+            syncSortedSetAdd(key, members);
     }
 
     public static void syncSetAdd(String key, MqMessage... mqMessages) {
@@ -121,12 +139,36 @@ public class RedisUtil {
             @Override
             Object exec() {
                 List<String> collect = Arrays.stream(msgs).flatMap(i -> Stream.of(MqHandleUtil.convertMqMessageToRedisString(i))).collect(Collectors.toList());
+                connection.sync().rpush(key, collect.toArray(new String[0]));
+                return super.exec();
+            }
+        }.doExec();
+    }
+
+
+
+    public static void syncListLPush(String key, MqMessage... msgs) {
+        new RedisCommandRunner<Object>() {
+            @Override
+            Object exec() {
+                List<String> collect = Arrays.stream(msgs).flatMap(i -> Stream.of(MqHandleUtil.convertMqMessageToRedisString(i))).collect(Collectors.toList());
                 connection.sync().lpush(key, collect.toArray(new String[0]));
                 return super.exec();
             }
         }.doExec();
+    }
+
+    public static String syncListRPop(String key) {
+
+        StatefulRedisConnection<String, String> connection = getConnection();
+        try {
+            return connection.sync().rpop(key);
+        } finally {
+            returnConnection(connection);
+        }
 
     }
+
 
 
     public static void syncSetRemove(String key, MqMessage... mqMessages) {
@@ -144,14 +186,13 @@ public class RedisUtil {
     }
 
     public static Set<String> syncSetPopAll(String key) {
-        RedisCommandRunner<Set<String>> runner = new RedisCommandRunner<Set<String>>() {
+        return new RedisCommandRunner<Set<String>>() {
             @Override
             public Set<String> exec() {
                 RedisCommands<String, String> sync = connection.sync();
                 return sync.spop(key, sync.scard(key));
             }
-        };
-        return doExec(runner);
+        }.exec();
     }
 
 
@@ -171,26 +212,6 @@ public class RedisUtil {
         }
     }
 
-    public static void syncQueueAdd(String key, String... members) {
-        StatefulRedisConnection<String, String> connection = getConnection();
-
-        try {
-            connection.sync().lpush(key, members);
-        } finally {
-            returnConnection(connection);
-        }
-    }
-
-    public static String syncQueueRPop(String key) {
-
-        StatefulRedisConnection<String, String> connection = getConnection();
-        try {
-            return connection.sync().rpop(key);
-        } finally {
-            returnConnection(connection);
-        }
-
-    }
 
 
     public static List<Pair<String, String>> syncKeysInfo(String keyPattern) {

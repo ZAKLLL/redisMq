@@ -13,7 +13,7 @@ import java.util.Map;
  * @description TODO
  * @date 5/27/2021 3:19 PM
  */
-public class SimpleHandlerHelper {
+public class NettyHandlerHelper {
     private final static Map<Class<?>, SimpleChannelInboundHandler<?>> handlerMap;
 
 

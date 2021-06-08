@@ -2,8 +2,8 @@ package com.zakl.clientconsumer;
 
 import com.zakl.annotation.MqSubScribe;
 import com.zakl.dto.MqMessage;
-import com.zakl.mqhandler.TemplateConsumer;
-import com.zakl.mqhandler.AckClientHandler;
+import com.zakl.msgdistribute.TemplateConsumer;
+import com.zakl.msgdistribute.AckClientHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

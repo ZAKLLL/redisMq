@@ -1,7 +1,7 @@
 package com.zakl.container;
 
 import com.zakl.config.ServerConfig;
-import com.zakl.nettyhandle.SimpleHandlerHelper;
+import com.zakl.nettyhandle.NettyHandlerHelper;
 import com.zakl.protostuff.ProtostuffCodecUtil;
 import com.zakl.protostuff.ProtostuffDecoder;
 import com.zakl.protostuff.ProtostuffEncoder;
@@ -26,7 +26,7 @@ import java.util.Map;
 public class MqServerContainer implements Container {
 
     private final NioEventLoopGroup serverBossGroup;
-    
+
     private final NioEventLoopGroup serverWorkerGroup;
 
 
@@ -65,7 +65,7 @@ public class MqServerContainer implements Container {
                     ProtostuffCodecUtil codecUtil = new ProtostuffCodecUtil(msgType);
                     ch.pipeline().addLast(new ProtostuffEncoder(codecUtil));
                     ch.pipeline().addLast(new ProtostuffDecoder(codecUtil)); //todo 添加心跳检测handler
-                    ch.pipeline().addLast(SimpleHandlerHelper.getSingletonHandler(msgType));
+                    ch.pipeline().addLast(NettyHandlerHelper.getSingletonHandler(msgType));
                 }
             });
 

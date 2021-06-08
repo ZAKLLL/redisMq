@@ -3,6 +3,7 @@ package com.zakl.statusManage;
 import com.zakl.dto.MqMessage;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -48,7 +49,9 @@ public class MqKeyHandleStatusManager {
     /**
      * mq key and it's buf data
      */
-    public final static Map<String, LinkedBlockingDeque<MqMessage>> keyMessagesBufMap = new ConcurrentHashMap<>();
+    public final static Map<String, Queue<MqMessage>> keyMessagesBufMap = new ConcurrentHashMap<>();
+
+
 
 
 

@@ -2,10 +2,11 @@ package com.zakl.statusManage;
 
 import cn.hutool.core.lang.Pair;
 import com.zakl.ack.AckHandlerManager;
+import com.zakl.config.ServerConfig;
 import com.zakl.dto.MqMessage;
 import com.zakl.util.MqHandleUtil;
-import com.zakl.mqhandler.PriorityPubMsgBufBufHandler;
-import com.zakl.mqhandler.RedisUtil;
+import com.zakl.msgdistribute.PubMsgBufBufHandler;
+import com.zakl.redisinteractive.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -20,9 +21,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.zakl.constant.Constants.*;
-import static com.zakl.mqhandler.KeyMsgDistributeThread.registerMsgDistributor;
+import static com.zakl.msgdistribute.KeyMsgDistributor.registerMsgDistributor;
 import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
-import static com.zakl.mqhandler.RedisUtil.syncKeys;
+import static com.zakl.redisinteractive.RedisUtil.syncKeys;
 import static com.zakl.statusManage.MqKeyHandleStatusManager.*;
 
 /**
@@ -56,7 +57,7 @@ public class StatusManager {
             registerNewSortedSetInRedis(keyName);
             log.info("start register new sorted Set in redis succeed ");
         }
-        keyMessagesBufMap.put(keyName, new LinkedBlockingDeque<>());
+        initKeyBuffer(keyName);
         if (clients.length > 0) {
             PriorityBlockingQueue<SubClientInfo> clientPq = new PriorityBlockingQueue<>(16, subClientComparator);
             keyClientsMap.put(keyName, clientPq);
@@ -103,7 +104,7 @@ public class StatusManager {
 
                 resetKeyStatus(key, new AtomicBoolean(true));
 
-                keyMessagesBufMap.put(key, new LinkedBlockingDeque<>());
+                initKeyBuffer(key);
 
                 registerMsgDistributor(key);
             }
@@ -141,7 +142,7 @@ public class StatusManager {
      */
     public static void registerNewSortedSetInRedis(String channelName) {
 
-        PriorityPubMsgBufBufHandler.registerNewSortedSetBuf(channelName);
+        PubMsgBufBufHandler.registerNewSortedSetBuf(channelName);
         RedisUtil.syncSortedSetAdd(channelName, new Pair<>(MIN_SCORE, KEY_HOLDER + channelName));
     }
 
@@ -180,5 +181,15 @@ public class StatusManager {
         AckHandlerManager.removeAckHandleThread(clientInfo);
     }
 
+    private static void initKeyBuffer(String keyName) {
+        if (MqHandleUtil.checkIfSortedSet(keyName)) {
+            //buff 缓冲区也需要支持 优先级
+            keyMessagesBufMap.put(keyName, new PriorityBlockingQueue<>(ServerConfig.PUB_BUFFER_MAX_LIMIT, (o1, o2) -> Double.compare(o2.getWeight(),o1.getWeight())));
+        } else if (MqHandleUtil.checkIfList(keyName)) {
+            keyMessagesBufMap.put(keyName, new LinkedBlockingDeque<>());
+        } else {
+            throw new RuntimeException("invalid keyName:" + keyName);
+        }
+    }
 }
 

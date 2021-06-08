@@ -1,4 +1,4 @@
-package com.zakl.mqhandler;
+package com.zakl.msgdistribute;
 
 import cn.hutool.core.lang.UUID;
 import com.zakl.annotation.AnnotationMethodInfo;

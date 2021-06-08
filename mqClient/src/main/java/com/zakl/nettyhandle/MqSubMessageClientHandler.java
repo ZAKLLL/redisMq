@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.zakl.mqhandler.keyMethodManager.disTributeMsgToConsumeMethod;
-import static com.zakl.mqhandler.keyMethodManager.genMqSubscribeMsg;
+import static com.zakl.msgdistribute.keyMethodManager.disTributeMsgToConsumeMethod;
+import static com.zakl.msgdistribute.keyMethodManager.genMqSubscribeMsg;
 
 /**
  * @author ZhangJiaKui

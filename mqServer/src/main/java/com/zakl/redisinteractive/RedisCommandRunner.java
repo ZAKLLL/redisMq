@@ -1,4 +1,4 @@
-package com.zakl.mqhandler;
+package com.zakl.redisinteractive;
 
 import io.lettuce.core.api.StatefulRedisConnection;
 

@@ -1,4 +1,4 @@
-package com.zakl.mqhandler;
+package com.zakl.msgdistribute;
 
 import com.zakl.dto.MqMessage;
 import lombok.extern.slf4j.Slf4j;

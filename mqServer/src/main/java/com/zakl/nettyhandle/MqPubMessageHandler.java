@@ -2,12 +2,10 @@ package com.zakl.nettyhandle;
 
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
-import com.zakl.mqhandler.FifoPubMsgBufBufHandler;
-import com.zakl.statusManage.PubClientManager;
 import com.zakl.dto.MqMessage;
-import com.zakl.mqhandler.PriorityPubMsgBufBufHandler;
-import com.zakl.mqhandler.PubMsgBufHandle;
+import com.zakl.msgdistribute.PubMsgBufBufHandler;
 import com.zakl.protocol.MqPubMessage;
+import com.zakl.statusManage.PubClientManager;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -29,8 +27,7 @@ import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 @ChannelHandler.Sharable
 public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessage> {
 
-    private static final PubMsgBufHandle sBufHandler = PriorityPubMsgBufBufHandler.getInstance();
-    private static final PubMsgBufHandle lBufHandler = FifoPubMsgBufBufHandler.getInstance();
+    private static final PubMsgBufBufHandler sBufHandler = PubMsgBufBufHandler.getInstance();
 
     private static final PubClientManager pubClientManager = PubClientManager.getInstance();
 
@@ -66,8 +63,7 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
                 listKeyMsgs.put(key, msgs);
             }
         }
-        lBufHandler.add(false, listKeyMsgs);
-        sBufHandler.add(false, sortedSetKeyMsgs);
+        sBufHandler.add( sortedSetKeyMsgs);
     }
 
     @Override

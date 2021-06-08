@@ -1,16 +1,12 @@
-package com.zakl.mqhandler;
+package com.zakl.msgdistribute;
 
 
 import com.zakl.dto.MqMessage;
-import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.statusManage.StatusManager;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -18,7 +14,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import static com.zakl.statusManage.MqKeyHandleStatusManager.*;
-import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 
 /**
  * @author Zakl
@@ -28,21 +23,21 @@ import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
  * @desc todo
  **/
 @Slf4j
-public class KeyMsgDistributeThread extends Thread {
+public class KeyMsgDistributor implements Runnable {
 
 
     private final static ExecutorService executors = Executors.newCachedThreadPool();
 
-    private final static Map<String, KeyMsgDistributeThread> keyMsgDistributeThreadMap = new HashMap<>();
+    private final static Map<String, KeyMsgDistributor> keyMsgDistributeThreadMap = new HashMap<>();
 
-    public final static String THREAD_NAME_PREFIX = "thread:keyDistribute:";
 
     private final Lock lock;
     private final String keyName;
     private final Condition canConsumeCondition;
     private final AtomicBoolean canConsumeFlag;
+    private Thread keyMsgDistributorThread;
 
-    private KeyMsgDistributeThread(String keyName) {
+    private KeyMsgDistributor(String keyName) {
         if (!keyHandleLockMap.containsKey(keyName) ||
                 !keyHandleConditionMap.containsKey(keyName) ||
                 !canConsumeStatusMap.containsKey(keyName)) {
@@ -55,13 +50,13 @@ public class KeyMsgDistributeThread extends Thread {
         this.canConsumeCondition = keyHandleConditionMap.get(keyName);
         this.canConsumeFlag = canConsumeStatusMap.get(keyName);
         this.keyName = keyName;
-        super.setName(THREAD_NAME_PREFIX + keyName);
         keyMsgDistributeThreadMap.put(keyName, this);
     }
 
 
     @Override
     public void run() {
+        keyMsgDistributorThread = Thread.currentThread();
         while (true) {
             try {
                 lock.lock();
@@ -77,7 +72,7 @@ public class KeyMsgDistributeThread extends Thread {
                     StatusManager.resetKeyStatus(keyName, canConsumeFlag);
                 }
             } catch (Exception e) {
-                log.error("",e);
+                log.error("", e);
                 e.printStackTrace();
             } finally {
                 lock.unlock();
@@ -86,15 +81,8 @@ public class KeyMsgDistributeThread extends Thread {
     }
 
     private static void handleRcvAndDistribute(String keyName) {
-        PubMsgBufHandle msgBufHandler;
-        MqMsgDistributeHandle distributeHandler;
-        if (checkIfSortedSet(keyName)) {
-            msgBufHandler = PriorityPubMsgBufBufHandler.getInstance();
-            distributeHandler = PriorityMsgDistributeHandler.getInstance();
-        } else {
-            msgBufHandler = FifoPubMsgBufBufHandler.getInstance();
-            distributeHandler = FifoMsgDistributeHandler.getInstance();
-        }
+        PubMsgBufBufHandler msgBufHandler = PubMsgBufBufHandler.getInstance();
+        MsgDistributeHandler distributeHandler = MsgDistributeHandler.getInstance();
         MqMessage mqMessage = msgBufHandler.listen(keyName);
         distributeHandler.distribute(mqMessage, keyName);
     }
@@ -106,12 +94,12 @@ public class KeyMsgDistributeThread extends Thread {
      * @param keyName
      */
     public static void registerMsgDistributor(String keyName) {
-        KeyMsgDistributeThread thread = keyMsgDistributeThreadMap.getOrDefault(keyName, null);
+        KeyMsgDistributor thread = keyMsgDistributeThreadMap.getOrDefault(keyName, null);
         if (thread != null) {
-            log.error("current key: {} exist msgDistributeThread :{} ,thread state:{}", thread.keyName, thread.getName(), thread.getState());
+            log.error("current key: {} exist msgDistributor :{} ,thread state:{}", thread.keyName, thread.keyMsgDistributorThread, thread.keyMsgDistributorThread.getState());
             return;
         }
         log.info("start a mqMsg distribute thread for key: {}", keyName);
-        executors.submit(new KeyMsgDistributeThread(keyName));
+        executors.submit(new KeyMsgDistributor(keyName));
     }
 }

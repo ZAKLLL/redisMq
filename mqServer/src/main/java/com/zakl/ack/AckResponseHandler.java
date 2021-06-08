@@ -1,7 +1,7 @@
 package com.zakl.ack;
 
 import com.zakl.dto.MqMessage;
-import com.zakl.mqhandler.RedisUtil;
+import com.zakl.redisinteractive.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

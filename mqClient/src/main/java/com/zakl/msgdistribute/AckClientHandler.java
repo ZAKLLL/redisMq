@@ -1,8 +1,7 @@
-package com.zakl.mqhandler;
+package com.zakl.msgdistribute;
 
 import com.zakl.dto.MqMessage;
 import com.zakl.nettyhandle.MqSubMessageClientHandler;
-import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
 
