@@ -9,7 +9,6 @@ import java.io.Serializable;
 /**
  * server config
  *
- * @author fengfei
  */
 @Slf4j
 @Data

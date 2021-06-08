@@ -71,7 +71,7 @@ public class RedisUtil {
                 connection.sync().zadd(key, nx, scoreMembers);
                 return super.exec();
             }
-        };
+        }.doExec();
     }
 
 
@@ -173,7 +173,7 @@ public class RedisUtil {
             List<String> exec() {
                 return connection.sync().rpop(key, cnt);
             }
-        }.exec();
+        }.doExec();
 
     }
 
@@ -199,7 +199,7 @@ public class RedisUtil {
                 RedisCommands<String, String> sync = connection.sync();
                 return sync.spop(key, sync.scard(key));
             }
-        }.exec();
+        }.doExec();
     }
 
 
@@ -236,7 +236,7 @@ public class RedisUtil {
                 }
                 return values;
             }
-        }.exec();
+        }.doExec();
 
     }
 

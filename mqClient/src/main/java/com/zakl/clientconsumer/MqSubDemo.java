@@ -12,7 +12,7 @@ import java.util.List;
 public class MqSubDemo extends TemplateConsumer {
 
 
-    @MqSubScribe(keys = {"k1"})
+//    @MqSubScribe(keys = {"k1"})
     @Override
     public void consumeWithAutoAck(List<MqMessage> msgs) {
         for (MqMessage msg : msgs) {
