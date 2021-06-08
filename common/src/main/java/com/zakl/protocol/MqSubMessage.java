@@ -1,5 +1,6 @@
 package com.zakl.protocol;
 
+import cn.hutool.core.lang.Pair;
 import com.zakl.dto.MqMessage;
 import io.protostuff.Morph;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -29,19 +31,29 @@ public class MqSubMessage implements Serializable {
     public transient static final byte TYPE_SUBSCRIBE = 0x01;
 
     /**
-     * mq消息传递
+     * mq message for activePush
      */
-    public transient static final byte TYPE_MQ_MESSAGE = 0x02;
+    public transient static final byte TYPE_MQ_MESSAGE_ACTIVE_PUSH = 0x02;
+
+    /**
+     * mq message for passiveCall
+     */
+    public transient static final byte TYPE_MQ_MESSAGE_PASSIVE_CALL = 0x03;
 
     /**
      * ACK确认信息 自动确认
      */
-    public transient static final byte TYPE_ACK_AUTO = 0x03;
+    public transient static final byte TYPE_ACK_AUTO = 0x04;
 
     /**
      * ACK确认消息 手动确认
      */
-    public transient static final byte TYPE_ACK_MANUAL = 0x04;
+    public transient static final byte TYPE_ACK_MANUAL = 0x05;
+
+    /**
+     * PASSIVE_CALL
+     */
+    public transient static final byte PASSIVE_CALL = 0x06;
 
 
     /**
@@ -59,7 +71,6 @@ public class MqSubMessage implements Serializable {
      * clientWeight
      */
     public Integer clientWeight = -1;
-
 
 
     /**
@@ -81,25 +92,20 @@ public class MqSubMessage implements Serializable {
     private Set<String> activePushKeys;
 
     /**
-     * 订阅的通道(客户端主动调用) 需要配置 主动调用数量
+     * 客户端主动调用的key,以及 对应的msg数量 只有当type==PASSIVE_CALL 时候有效
      * only user for first register , null value when other time;
      */
     @Morph
-    private Set<String> passiveCallKeys;
+    private List<Pair<String, Integer>> passiveCallKeys;
 
-
+    /**
+     * 被动调用的id
+     */
+    private String passiveCallId;
     /**
      * messages From Server
      */
     @Morph
     private List<MqMessage> mqMessages;
-
-
-    public List<String> getAllKeys(){
-        List<String> keys=new ArrayList<>();
-        keys.addAll(activePushKeys);
-        keys.addAll(passiveCallKeys);
-        return keys;
-    }
 
 }

@@ -5,10 +5,8 @@ import com.zakl.annotation.AnnotationMethodInfo;
 import com.zakl.annotation.AnnotationUtil;
 import com.zakl.annotation.MqSubScribe;
 import com.zakl.config.ClientConfig;
-import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.util.MqHandleUtil;
-import com.zakl.util.ReflectionUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +14,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.zakl.protocol.MqSubMessage.TYPE_SUBSCRIBE;
 
@@ -33,7 +30,6 @@ public class keyMethodManager {
 
     private static final Set<String> activePushKeys = new HashSet<>();
 
-    private static final Set<String> passiveCallKeys = new HashSet<>();
 
     public static void main(String[] args) {
         MqSubMessage mqSubMessage = genMqSubscribeMsg();
@@ -63,11 +59,7 @@ public class keyMethodManager {
                     log.error(errMsg);
                     throw new RuntimeException(errMsg);
                 }
-                if (annotation.activePush()) {
-                    activePushKeys.add(key);
-                } else {
-                    passiveCallKeys.add(key);
-                }
+                activePushKeys.add(key);
                 keyConsumeMethodsMap.put(key, annotationMethodInfo);
             }
         }
@@ -75,7 +67,6 @@ public class keyMethodManager {
         mqSubMessage.setClientId(UUID.randomUUID().toString());
         mqSubMessage.setType(TYPE_SUBSCRIBE);
         mqSubMessage.setActivePushKeys(activePushKeys);
-        mqSubMessage.setPassiveCallKeys(passiveCallKeys);
         return mqSubMessage;
     }
 
@@ -129,21 +120,4 @@ public class keyMethodManager {
         if (!flag) throw new RuntimeException("illegal paramException");
     }
 
-
-    public static void disTributeMsgToConsumeMethod(MqSubMessage msg) {
-        Map<String, List<MqMessage>> keyMsgsMap = msg.getMqMessages().stream().collect(Collectors.groupingBy(MqMessage::getKey));
-        for (String key : keyMsgsMap.keySet()) {
-            List<MqMessage> mqMessages = keyMsgsMap.get(key);
-            AnnotationMethodInfo<MqSubScribe> annotationMethodInfo = keyConsumeMethodsMap.get(key);
-            MqSubScribe annotation = annotationMethodInfo.getAnnotation();
-            Method method = annotationMethodInfo.getMethod();
-            Object object = annotationMethodInfo.getTargetObject();
-            if (annotation.autoAck()) {
-                new AckClientHandler(MqSubMessage.TYPE_ACK_AUTO).confirm(mqMessages.toArray(new MqMessage[0]));
-                ReflectionUtils.reflectInvoke(object, method, new Object[]{mqMessages});
-            } else {
-                ReflectionUtils.reflectInvoke(object, method, new Object[]{mqMessages, new AckClientHandler(MqSubMessage.TYPE_ACK_MANUAL)});
-            }
-        }
-    }
 }

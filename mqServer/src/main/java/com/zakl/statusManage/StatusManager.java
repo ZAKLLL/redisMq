@@ -67,7 +67,6 @@ public class StatusManager {
                 clientPq.add(client);
             }
         }
-
         registerMsgDistributor(keyName);
     }
 

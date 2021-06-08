@@ -8,7 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.zakl.msgdistribute.keyMethodManager.disTributeMsgToConsumeMethod;
+import static com.zakl.msgdistribute.MqMsgDistributor.distributeMsgToCaller;
+import static com.zakl.msgdistribute.MqMsgDistributor.distributeMsgToConsumeMethod;
 import static com.zakl.msgdistribute.keyMethodManager.genMqSubscribeMsg;
 
 /**
@@ -26,7 +27,11 @@ public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
     protected void channelRead0(ChannelHandlerContext ctx, MqSubMessage msg) throws Exception {
         log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelRead: {}", msg);
-        disTributeMsgToConsumeMethod(msg);
+        if (msg.getType() == MqSubMessage.TYPE_MQ_MESSAGE_ACTIVE_PUSH) {
+            distributeMsgToConsumeMethod(msg);
+        } else if (msg.getType() == MqSubMessage.TYPE_MQ_MESSAGE_PASSIVE_CALL) {
+            distributeMsgToCaller(msg);
+        }
     }
 
     @Override

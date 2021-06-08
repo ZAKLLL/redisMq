@@ -34,6 +34,7 @@ public @interface MqSubScribe {
 
 
     /**
+     * todo 实现
      * 期望单次推送收到的消息数(当消息不足expectCnt的时候,返回最大消息数)
      */
     int expectCnt() default 1;
@@ -43,10 +44,6 @@ public @interface MqSubScribe {
      */
     boolean autoAck() default true;
 
-    /**
-     * 是否由服务端主动推送信息(false 代表客户端主动调用server端获取信息)
-     */
-    boolean activePush() default true;
 
 
 }

@@ -8,6 +8,7 @@ import com.zakl.redisinteractive.RedisUtil;
 import com.zakl.dto.MqMessage;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.statusManage.SubClientInfo;
+import com.zakl.util.MqHandleUtil;
 import io.lettuce.core.ScoredValue;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import static com.zakl.statusManage.StatusManager.suspendDistributeThread;
 import static com.zakl.util.MqHandleUtil.convertRedisStringToMqMessage;
 
 @Slf4j
-public class MsgDistributeHandler  {
+public class MsgDistributeHandler {
 
     private final static MsgDistributeHandler instance = new MsgDistributeHandler();
 
@@ -33,6 +34,30 @@ public class MsgDistributeHandler  {
     }
 
     public void distribute(MqMessage bufMsg, String keyName) {
+        if (MqHandleUtil.checkIfSortedSet(keyName)) {
+            priorityDistribute(bufMsg, keyName);
+        } else if (MqHandleUtil.checkIfList(keyName)) {
+            listDistribute(bufMsg, keyName);
+        }
+    }
+
+    private void listDistribute(MqMessage bufMsg, String keyName) {
+        MqMessage msgToDistribute = null;
+        String msgFromRedis = RedisUtil.syncListRPop(keyName);
+        if (msgFromRedis != null) {
+            msgToDistribute = MqHandleUtil.convertRedisStringToMqMessage(keyName, -1, msgFromRedis);
+            if (bufMsg != null) {
+                RedisUtil.syncListRPush(bufMsg);
+            }
+        } else if (bufMsg != null) {
+            msgToDistribute = bufMsg;
+        }
+        if (msgToDistribute != null) {
+            doDistribute(msgToDistribute, keyName);
+        }
+    }
+
+    private void priorityDistribute(MqMessage bufMsg, String keyName) {
         MqMessage msgToDistribute;
         ScoredValue<String> scoreValue = RedisUtil.syncSortedSetPopMax(keyName);
         if (scoreValue.hasValue() && bufMsg != null) {
@@ -94,7 +119,7 @@ public class MsgDistributeHandler  {
 
 
         MqSubMessage mqSubMessage = new MqSubMessage();
-        mqSubMessage.setType(MqSubMessage.TYPE_MQ_MESSAGE);
+        mqSubMessage.setType(MqSubMessage.TYPE_MQ_MESSAGE_ACTIVE_PUSH);
         mqSubMessage.setMqMessages(ListUtil.toList(mqMessage));
         ctx.writeAndFlush(mqSubMessage);
 

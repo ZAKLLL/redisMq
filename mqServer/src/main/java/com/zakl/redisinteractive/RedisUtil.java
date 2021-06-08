@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+import java.time.chrono.MinguoChronology;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -64,7 +65,7 @@ public class RedisUtil {
             scoreMembers[index++] = member.getKey();
             scoreMembers[index++] = member.getValue();
         }
-        new RedisCommandRunner<Object>(){
+        new RedisCommandRunner<Object>() {
             @Override
             Object exec() {
                 connection.sync().zadd(key, nx, scoreMembers);
@@ -92,17 +93,16 @@ public class RedisUtil {
     }
 
 
+    public static void syncSortedSetAdd(String key, MqMessage... mqMessages) {
 
-    public static void syncSortedSetAdd(String key,MqMessage... mqMessages) {
-
-            Pair<Double, String>[] members = new Pair[mqMessages.length];
-            for (int i = 0; i < mqMessages.length; i++) {
-                MqMessage msg = mqMessages[i];
-                double score = msg.getWeight();
-                String data = String.format("uuid:%s\n%s", msg.getMessageId(), msg.getMessage());
-                members[i] = new Pair<>(score, data);
-            }
-            syncSortedSetAdd(key, members);
+        Pair<Double, String>[] members = new Pair[mqMessages.length];
+        for (int i = 0; i < mqMessages.length; i++) {
+            MqMessage msg = mqMessages[i];
+            double score = msg.getWeight();
+            String data = String.format("uuid:%s\n%s", msg.getMessageId(), msg.getMessage());
+            members[i] = new Pair<>(score, data);
+        }
+        syncSortedSetAdd(key, members);
     }
 
     public static void syncSetAdd(String key, MqMessage... mqMessages) {
@@ -146,7 +146,6 @@ public class RedisUtil {
     }
 
 
-
     public static void syncListLPush(String key, MqMessage... msgs) {
         new RedisCommandRunner<Object>() {
             @Override
@@ -159,16 +158,24 @@ public class RedisUtil {
     }
 
     public static String syncListRPop(String key) {
-
         StatefulRedisConnection<String, String> connection = getConnection();
         try {
             return connection.sync().rpop(key);
         } finally {
             returnConnection(connection);
         }
-
     }
 
+    public static List<String> syncListRPop(String key, int cnt) {
+
+        return new RedisCommandRunner<List<String>>() {
+            @Override
+            List<String> exec() {
+                return connection.sync().rpop(key, cnt);
+            }
+        }.exec();
+
+    }
 
 
     public static void syncSetRemove(String key, MqMessage... mqMessages) {
@@ -212,6 +219,26 @@ public class RedisUtil {
         }
     }
 
+    public static List<ScoredValue<String>> syncSortedSetPopMax(String key, Integer cnt) {
+        return new RedisCommandRunner<List<ScoredValue<String>>>() {
+            @Override
+            List<ScoredValue<String>> exec() {
+                List<ScoredValue<String>> values = connection.sync().zpopmax(key, cnt);
+                ScoredValue<String> minScoredValue = null;
+                for (ScoredValue<String> i : values) {
+                    if (i.getScore() == MIN_SCORE) {
+                        minScoredValue = i;
+                        break;
+                    }
+                }
+                if (minScoredValue != null) {
+                    values.remove(minScoredValue);
+                }
+                return values;
+            }
+        }.exec();
+
+    }
 
 
     public static List<Pair<String, String>> syncKeysInfo(String keyPattern) {

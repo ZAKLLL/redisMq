@@ -2,6 +2,7 @@ package com.zakl.statusManage;
 
 import com.zakl.dto.MqMessage;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +19,7 @@ public class MqKeyHandleStatusManager {
 
 
     /**
-     * key and it's subscriber
+     * key and it's subscriber (ActivePush)
      */
     public final static Map<String, PriorityBlockingQueue<SubClientInfo>> keyClientsMap = new ConcurrentHashMap<>(16);
 

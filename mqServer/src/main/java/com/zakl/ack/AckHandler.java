@@ -4,6 +4,11 @@ package com.zakl.ack;
 import com.zakl.statusManage.SubClientInfo;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,7 +24,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AckHandler implements Runnable {
 
 
-    private final AtomicReference<AckCallBack> ackCallBackRef;
+
+    private final Queue<AckCallBack> ackCallBackQueue = new ConcurrentLinkedQueue<>();
 
     private final SubClientInfo subClientInfo;
 
@@ -38,7 +44,6 @@ public class AckHandler implements Runnable {
         }
         lock = new ReentrantLock();
         condition = lock.newCondition();
-        ackCallBackRef = new AtomicReference<>(null);
         this.subClientInfo = subClientInfo;
     }
 
@@ -49,9 +54,11 @@ public class AckHandler implements Runnable {
         log.info("submit New AckHandleRequest,MqMsg:{}", ackCallBack.getMqMessage());
         String messageId = ackCallBack.getMqMessage().getMessageId();
         AckResponseHandler.ackCallBackMap.put(messageId, ackCallBack);
+
+
         lock.lock();
         try {
-            ackCallBackRef.set(ackCallBack);
+            ackCallBackQueue.offer(ackCallBack);
             condition.signal();
         } finally {
             lock.unlock();
@@ -77,8 +84,8 @@ public class AckHandler implements Runnable {
         while (true) {
             lock.lock();
             try {
-                while (ackCallBackRef.get() != null && subClientInfo.isAlive) {
-                    AckCallBack ackCallBack = this.ackCallBackRef.getAndSet(null);
+                while (!ackCallBackQueue.isEmpty() && subClientInfo.isAlive) {
+                    AckCallBack ackCallBack = ackCallBackQueue.poll();
                     ackCallBack.start(subClientInfo);
                 }
                 condition.await();
