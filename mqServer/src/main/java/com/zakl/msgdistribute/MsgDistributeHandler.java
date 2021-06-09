@@ -60,6 +60,7 @@ public class MsgDistributeHandler {
     private void priorityDistribute(MqMessage bufMsg, String keyName) {
         MqMessage msgToDistribute;
         ScoredValue<String> scoreValue = RedisUtil.syncSortedSetPopMax(keyName);
+        log.info("sorted set data from redis :{}", scoreValue);
         if (scoreValue.hasValue() && bufMsg != null) {
             // buf区与redis中均有数据
             // 将此信息与RedisServer 中的 max value进行比对,如果当前信息优先级更高,则分发该信息

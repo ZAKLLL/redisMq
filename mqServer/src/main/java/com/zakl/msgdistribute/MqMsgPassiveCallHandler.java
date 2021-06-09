@@ -67,7 +67,7 @@ public class MqMsgPassiveCallHandler {
         int tmtCnt = 0;
         List<String> redisMsgs = RedisUtil.syncListRPop(keyName, cnt);
         tmtCnt += redisMsgs.size();
-        redisMsgs.forEach(i -> ret.add(MqHandleUtil.convertRedisStringToMqMessage(keyName, -1, i)));
+        redisMsgs.forEach(msg -> ret.add(MqHandleUtil.convertRedisStringToMqMessage(keyName, -1, msg)));
         while (tmtCnt++ < cnt) {
             MqMessage mqMessage = bufBufHandler.listen(keyName);
             if (mqMessage == null) {

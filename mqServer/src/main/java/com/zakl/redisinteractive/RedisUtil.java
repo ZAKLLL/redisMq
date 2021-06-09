@@ -82,8 +82,8 @@ public class RedisUtil {
         for (String key : keyMsgMap.keySet()) {
             List<MqMessage> keyMsgs = keyMsgMap.get(key);
             Pair<Double, String>[] members = new Pair[keyMsgs.size()];
-            for (int i = 0; i < mqMessages.length; i++) {
-                MqMessage msg = mqMessages[i];
+            for (int i = 0; i < members.length; i++) {
+                MqMessage msg = keyMsgs.get(i);
                 double score = msg.getWeight();
                 String data = String.format("uuid:%s\n%s", msg.getMessageId(), msg.getMessage());
                 members[i] = new Pair<>(score, data);

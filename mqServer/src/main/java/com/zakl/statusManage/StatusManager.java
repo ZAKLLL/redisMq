@@ -58,9 +58,9 @@ public class StatusManager {
             log.info("start register new sorted Set in redis succeed ");
         }
         initKeyBuffer(keyName);
+        PriorityBlockingQueue<SubClientInfo> clientPq = new PriorityBlockingQueue<>(16, subClientComparator);
+        keyClientsMap.put(keyName, clientPq);
         if (clients.length > 0) {
-            PriorityBlockingQueue<SubClientInfo> clientPq = new PriorityBlockingQueue<>(16, subClientComparator);
-            keyClientsMap.put(keyName, clientPq);
             for (SubClientInfo client : clients) {
                 log.info("register new client {} to server ", client);
                 clientIdMap.put(keyName, client);
@@ -183,7 +183,7 @@ public class StatusManager {
     private static void initKeyBuffer(String keyName) {
         if (MqHandleUtil.checkIfSortedSet(keyName)) {
             //buff 缓冲区也需要支持 优先级
-            keyMessagesBufMap.put(keyName, new PriorityBlockingQueue<>(ServerConfig.PUB_BUFFER_MAX_LIMIT, (o1, o2) -> Double.compare(o2.getWeight(),o1.getWeight())));
+            keyMessagesBufMap.put(keyName, new PriorityBlockingQueue<>(ServerConfig.PUB_BUFFER_MAX_LIMIT, (o1, o2) -> Double.compare(o2.getWeight(), o1.getWeight())));
         } else if (MqHandleUtil.checkIfList(keyName)) {
             keyMessagesBufMap.put(keyName, new LinkedBlockingDeque<>());
         } else {
