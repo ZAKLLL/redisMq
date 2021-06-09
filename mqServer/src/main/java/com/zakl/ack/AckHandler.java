@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -20,7 +22,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AckHandler implements Runnable {
 
 
-
     private final Queue<AckCallBack> ackCallBackQueue = new ConcurrentLinkedQueue<>();
 
     private final SubClientInfo subClientInfo;
@@ -30,6 +31,8 @@ public class AckHandler implements Runnable {
     private final Condition condition;
 
     private Thread ackHandleRealThread;
+
+    private final static ExecutorService executors = Executors.newCachedThreadPool();
 
 
     public AckHandler(SubClientInfo subClientInfo) {
@@ -81,7 +84,9 @@ public class AckHandler implements Runnable {
             try {
                 while (!ackCallBackQueue.isEmpty() && subClientInfo.isAlive) {
                     AckCallBack ackCallBack = ackCallBackQueue.poll();
-                    ackCallBack.start(subClientInfo);
+                    //todo 是否为每个ack 开启一个线程 过于耗费性能
+                    //异步
+                    executors.submit(() -> ackCallBack.start(subClientInfo));
                 }
                 condition.await();
             } catch (InterruptedException e) {

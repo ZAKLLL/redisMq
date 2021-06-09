@@ -27,6 +27,7 @@ public class AckCallBack {
     }
 
     public void start(SubClientInfo subClientInfo) {
+        log.info("start new Ack callBack,msg:{}",mqMessage);
         try {
             lock.lock();
             await();
@@ -36,6 +37,7 @@ public class AckCallBack {
             // push client back to clientPq
             MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey()).offer(subClientInfo);
             //remind  Distributor continue work
+            //todo 临时关闭,解决多key 消费时 ack time out bug
             remindDistributeThreadConsume(mqMessage.getKey());
         } catch (TimeoutException e) {
             AckResponseHandler.ackBackUp(mqMessage);
@@ -48,8 +50,8 @@ public class AckCallBack {
     public void over(byte ackType) {
         try {
             lock.lock();
-            finish.signal();
             AckResponseHandler.handleAckSuccessFully(mqMessage, ackType);
+            finish.signal();
         } finally {
             lock.unlock();
         }
@@ -59,6 +61,9 @@ public class AckCallBack {
         boolean timeout = false;
         try {
             timeout = finish.await(10000, TimeUnit.MILLISECONDS);
+//            if (timeout){
+//                log.info("signal successfully");
+//            }
         } catch (InterruptedException e) {
             log.error("msg:{} handleAckSuccessFailed,cause by interrupted,", mqMessage);
             AckResponseHandler.handleAckSuccessFailed(mqMessage);
