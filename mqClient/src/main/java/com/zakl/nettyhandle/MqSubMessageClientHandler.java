@@ -25,7 +25,7 @@ public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MqSubMessage msg) throws Exception {
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
+        log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelRead: {}", msg);
         if (msg.getType() == MqSubMessage.TYPE_MQ_MESSAGE_ACTIVE_PUSH) {
             distributeMsgToConsumeMethod(msg);
@@ -36,7 +36,7 @@ public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
+        log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelActive");
         MqSubMessageClientHandler.ctx = ctx;
         log.info("start register cur client to MqServer ");
@@ -48,7 +48,7 @@ public class MqSubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
+        log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelInactive");
         super.channelInactive(ctx);
     }

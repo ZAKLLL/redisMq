@@ -60,14 +60,14 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
+        log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelActive");
         super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("【" + ctx.channel().id() + "】" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "==>>>"
+        log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "==>>>"
                 + "channelInactive");
         super.channelInactive(ctx);
     }
