@@ -27,7 +27,6 @@ public class RedisMqStarter {
 
 
     public static void main(String[] args) {
-        MDC.put("process_id ", ManagementFactory.getRuntimeMXBean().getName());
         initServerData();
 
         MqServerContainer mqServerContainer = new MqServerContainer(serverBossGroup, MqPubMessage.class);

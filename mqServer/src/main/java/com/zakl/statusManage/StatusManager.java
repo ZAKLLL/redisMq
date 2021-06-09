@@ -4,9 +4,9 @@ import cn.hutool.core.lang.Pair;
 import com.zakl.ack.AckHandlerManager;
 import com.zakl.config.ServerConfig;
 import com.zakl.dto.MqMessage;
-import com.zakl.util.MqHandleUtil;
 import com.zakl.msgdistribute.PubMsgBufBufHandler;
 import com.zakl.redisinteractive.RedisUtil;
+import com.zakl.util.MqHandleUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.zakl.constant.Constants.*;
 import static com.zakl.msgdistribute.KeyMsgDistributor.registerMsgDistributor;
-import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 import static com.zakl.redisinteractive.RedisUtil.syncKeys;
 import static com.zakl.statusManage.MqKeyHandleStatusManager.*;
+import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 
 /**
  * @author ZhangJiaKui

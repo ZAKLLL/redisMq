@@ -12,7 +12,8 @@
         <module>mqServer</module>
         <module>mqClient</module>
         <module>common</module>
-        <module>log</module>
+        <module>mqPubRelease</module>
+        <module>mqSubRelease</module>
     </modules>
 
 

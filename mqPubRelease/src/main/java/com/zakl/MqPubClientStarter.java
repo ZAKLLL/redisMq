@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author ZhangJiaKui
- * @classname MqPubClientStarter
+ * @classname com.zakl.MqPubClientStarter
  * @description TODO
  * @date 6/4/2021 4:31 PM
  */
@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MqPubClientStarter implements ClientServiceLoader {
 
 //    static {
-//        log.info("load MqPubClientStarter");
+//        log.info("load com.zakl.MqPubClientStarter");
 //        new MqClientContainer(true).start();
 //    }
 

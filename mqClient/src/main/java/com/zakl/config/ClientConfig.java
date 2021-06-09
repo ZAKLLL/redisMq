@@ -49,7 +49,7 @@ public class ClientConfig implements Serializable {
 
         serverIp = ConfigUtil.getInstance().getStringValue("server.ip");
 
-        consumePackage = ConfigUtil.getInstance().getStringValue("client.consumePackage");
+        consumePackage = ConfigUtil.getInstance().getStringValue("client.consumerPackage");
 
         log.info(
                 "config init serverIp{}, mqPubPort {}, mqSubPort {}, consumePackage {}",

@@ -1,4 +1,4 @@
-package com.zakl.clientconsumer;
+package clientconsumer;
 
 import com.zakl.dto.MqMessage;
 import com.zakl.msgdistribute.TemplateConsumer;

@@ -28,7 +28,7 @@ import static com.zakl.protocol.MqSubMessage.TYPE_ACK_AUTO;
 @Slf4j
 public class MqMsgDistributor {
 
-    public final static Map<String, MessageCallBack> passiveCallMsgMap = new ConcurrentHashMap<>();
+    public final static Map<String, MessageCallBack<List<MqMessage>>> passiveCallMsgMap = new ConcurrentHashMap<>();
 
     public static void distributeMsgToConsumeMethod(MqSubMessage msg) {
         Map<String, List<MqMessage>> keyMsgsMap = msg.getMqMessages().stream().collect(Collectors.groupingBy(MqMessage::getKey));
@@ -49,7 +49,7 @@ public class MqMsgDistributor {
 
 
     public static void distributeMsgToCaller(MqSubMessage mqSubMessage) {
-        MessageCallBack messageCallBack = passiveCallMsgMap.get(mqSubMessage.getPassiveCallId());
+        MessageCallBack<List<MqMessage>> messageCallBack = passiveCallMsgMap.get(mqSubMessage.getPassiveCallId());
         if (messageCallBack == null) {
             log.error("no corresponding messageCallBack for passiveCallId: {}", mqSubMessage.getPassiveCallId());
             return;
