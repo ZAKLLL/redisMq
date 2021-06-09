@@ -66,6 +66,7 @@ public class AckCallBack {
         }
         if (!timeout) {
             AckResponseHandler.handleAckSuccessFailed(mqMessage);
+            log.error("Ack time out,mqMsg:{}", mqMessage);
             throw new TimeoutException("Ack time out,push back to redis...");
         }
     }
