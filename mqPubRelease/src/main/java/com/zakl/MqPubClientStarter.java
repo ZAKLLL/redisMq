@@ -32,9 +32,10 @@ public class MqPubClientStarter implements ClientServiceLoader {
             @SneakyThrows
             @Override
             public void run() {
+                Thread.sleep(5000);
                 while (true) {
-                    Thread.sleep(3000);
-                    String[] keys = {"k1","k2","k3","k4"};
+                    Thread.sleep(1000);
+                    String[] keys = {"k1","k3"};
                     for (String key : keys) {
                         String value = "HelloWorld" + System.currentTimeMillis();
                         Publisher.publishToSortedSetKey(key,new Pair<>(random.nextDouble()*100,value));

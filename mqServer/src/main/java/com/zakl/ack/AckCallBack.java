@@ -20,6 +20,8 @@ public class AckCallBack {
     private final Lock lock = new ReentrantLock();
     private final Condition finish = lock.newCondition();
 
+    private volatile boolean finishFlag = false;
+
     private final MqMessage mqMessage;
 
     public AckCallBack(MqMessage mqMessage) {
@@ -27,17 +29,21 @@ public class AckCallBack {
     }
 
     public void start(SubClientInfo subClientInfo) {
-        log.info("start new Ack callBack,msg:{}",mqMessage);
+        if (finishFlag) {
+            //it means ack response before ackCallback start
+            // (because ackCall back start control by AckHandler,which  calls ackCallBack's start one by one blocking)
+            MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey()).offer(subClientInfo);
+            remindDistributeThreadConsume(mqMessage.getKey());
+            return;
+        }
+        log.info("start new Ack callBack,msg:{}", mqMessage);
         try {
             lock.lock();
             await();
-            AckResponseHandler.cleanAckBackUp(mqMessage);
-
             // current msg get target client ACkResponse
             // push client back to clientPq
             MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey()).offer(subClientInfo);
             //remind  Distributor continue work
-            //todo 临时关闭,解决多key 消费时 ack time out bug
             remindDistributeThreadConsume(mqMessage.getKey());
         } catch (TimeoutException e) {
             AckResponseHandler.ackBackUp(mqMessage);
@@ -51,6 +57,8 @@ public class AckCallBack {
         try {
             lock.lock();
             AckResponseHandler.handleAckSuccessFully(mqMessage, ackType);
+            AckResponseHandler.cleanAckBackUp(mqMessage);
+            finishFlag = true;
             finish.signal();
         } finally {
             lock.unlock();
@@ -61,9 +69,6 @@ public class AckCallBack {
         boolean timeout = false;
         try {
             timeout = finish.await(10000, TimeUnit.MILLISECONDS);
-//            if (timeout){
-//                log.info("signal successfully");
-//            }
         } catch (InterruptedException e) {
             log.error("msg:{} handleAckSuccessFailed,cause by interrupted,", mqMessage);
             AckResponseHandler.handleAckSuccessFailed(mqMessage);

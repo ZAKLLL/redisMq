@@ -84,9 +84,10 @@ public class AckHandler implements Runnable {
             try {
                 while (!ackCallBackQueue.isEmpty() && subClientInfo.isAlive) {
                     AckCallBack ackCallBack = ackCallBackQueue.poll();
+                    ackCallBack.start(subClientInfo);
                     //todo 是否为每个ack 开启一个线程 过于耗费性能
                     //异步
-                    executors.submit(() -> ackCallBack.start(subClientInfo));
+//                    executors.submit(() -> ackCallBack.start(subClientInfo));
                 }
                 condition.await();
             } catch (InterruptedException e) {
