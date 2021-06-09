@@ -36,7 +36,7 @@ public class RedisUtil {
         log.info("initializing the Lettuce pool ");
 
         GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig = new GenericObjectPoolConfig<>();
-        poolConfig.setMaxIdle(30);
+        poolConfig.setMaxIdle(600);
 
         RedisClient client = RedisClient.create(String.format("redis://%s@%s:%d/%d", RedisConfig.pwd, RedisConfig.host, RedisConfig.port, RedisConfig.db));
 

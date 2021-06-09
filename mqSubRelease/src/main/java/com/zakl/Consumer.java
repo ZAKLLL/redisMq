@@ -17,7 +17,7 @@ import java.util.List;
  **/
 @Slf4j
 public class Consumer extends TemplateConsumer {
-    @MqSubScribe(keys = {"k1"})
+    @MqSubScribe(keys = {"k2","k3","k4"})
     @Override
     public void consumeWithAutoAck(List<MqMessage> msgs) {
         for (MqMessage msg : msgs) {
