@@ -5,6 +5,9 @@ import com.zakl.protocol.MqSubMessage;
 import com.zakl.statusManage.StatusManager;
 import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+
+import java.lang.management.ManagementFactory;
 
 /**
  * @author ZhangJiaKui
@@ -24,7 +27,6 @@ public class RedisMqStarter {
 
 
     public static void main(String[] args) {
-
         initServerData();
 
         MqServerContainer mqServerContainer = new MqServerContainer(serverBossGroup, MqPubMessage.class);

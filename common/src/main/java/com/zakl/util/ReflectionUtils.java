@@ -3,10 +3,12 @@ package com.zakl.util;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.jws.Oneway;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,5 +136,14 @@ public class ReflectionUtils {
         }
     }
 
+    @SneakyThrows
+    public static Object reflectInvoke(Object target, Method method, Object[] args) {
+        method.setAccessible(true);
+        if (Modifier.isStatic(method.getModifiers())) {
+            return method.invoke(target.getClass(), args);
+        } else {
+            return method.invoke(target, args);
+        }
+    }
 }
 

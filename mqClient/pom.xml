@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mqPubClient</artifactId>
+    <artifactId>mqClient</artifactId>
 
 
     <dependencies>
@@ -27,6 +27,7 @@
     </dependencies>
 
 
+
     <build>
         <plugins>
             <plugin>
@@ -35,6 +36,7 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
+                    <encoding>utf-8</encoding>
                 </configuration>
             </plugin>
         </plugins>

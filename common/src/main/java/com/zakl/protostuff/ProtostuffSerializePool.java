@@ -30,7 +30,7 @@ public class ProtostuffSerializePool {
     }
 
     public ProtostuffSerializePool(final int maxTotal, final int minIdle, final long maxWaitMillis, final long minEvictableIdleTimeMillis) {
-        protostuffPool = new GenericObjectPool<ProtostuffSerialize>(new ProtostuffSerializeFactory());
+        protostuffPool = new GenericObjectPool<>(new ProtostuffSerializeFactory());
 
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
 

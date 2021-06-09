@@ -43,4 +43,8 @@ public interface Constants {
     Double MIN_SCORE = Double.MIN_VALUE;
 
 
+    /**
+     * score for List msg to construct MqMessage(every element has a score,-1 means list data)
+     */
+    Double LIST_MSG_SCORE=-1d;
 }

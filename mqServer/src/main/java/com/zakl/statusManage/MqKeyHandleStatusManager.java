@@ -2,7 +2,9 @@ package com.zakl.statusManage;
 
 import com.zakl.dto.MqMessage;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -17,7 +19,7 @@ public class MqKeyHandleStatusManager {
 
 
     /**
-     * key and it's subscriber
+     * key and it's subscriber (ActivePush)
      */
     public final static Map<String, PriorityBlockingQueue<SubClientInfo>> keyClientsMap = new ConcurrentHashMap<>(16);
 
@@ -40,7 +42,7 @@ public class MqKeyHandleStatusManager {
 
 
     /**
-     * if key has msg let thread consume
+     * if key has msg && has client to let thread consume
      */
     public final static Map<String, AtomicBoolean> canConsumeStatusMap = new ConcurrentHashMap<>();
 
@@ -48,25 +50,10 @@ public class MqKeyHandleStatusManager {
     /**
      * mq key and it's buf data
      */
-    public final static Map<String, LinkedBlockingDeque<MqMessage>> keyMessagesBufMap = new ConcurrentHashMap<>();
+    public final static Map<String, Queue<MqMessage>> keyMessagesBufMap = new ConcurrentHashMap<>();
 
-    /**
-     * remind key's consume thread can continue consume
-     *
-     * @param keyName
-     */
-    public static void remindConsume(String keyName) {
-        Condition condition = keyHandleConditionMap.get(keyName);
-        Lock lock = keyHandleLockMap.get(keyName);
-        AtomicBoolean flag = canConsumeStatusMap.get(keyName);
-        if (flag.get()) {
-            try {
-                lock.lock();
-                condition.signal();
-            } finally {
-                lock.unlock();
-            }
-        }
-    }
+
+
+
 
 }

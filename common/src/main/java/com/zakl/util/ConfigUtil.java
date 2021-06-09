@@ -27,7 +27,7 @@ public class ConfigUtil {
 
     private void initConfig(String configFile) {
 
-        try (InputStream is = ConfigUtil.class.getClassLoader().getResourceAsStream(configFile);) {
+        try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(configFile);) {
             configuration.load(is);
         } catch (IOException ex) {
             throw new RuntimeException(ex);

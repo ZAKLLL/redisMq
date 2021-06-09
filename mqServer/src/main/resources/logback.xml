@@ -12,13 +12,9 @@
     <!-- 彩色日志依赖的渲染类 -->
     <conversionRule conversionWord="clr"
                     converterClass="ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter"/>
-    <conversionRule conversionWord="wex"
-                    converterClass="ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter"/>
-    <conversionRule conversionWord="wEx"
-                    converterClass="ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter"/>
     <!-- 彩色日志格式 -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="${CONSOLE_LOG_PATTERN:-%red(%contextName)-%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+              value="${CONSOLE_LOG_PATTERN:-%red(%contextName)-%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%clr}}"/>
 
 
     <!--输出到控制台 -->
@@ -168,7 +164,6 @@
             <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
-
 
 
     <root level="info">
