@@ -1,6 +1,5 @@
 package com.zakl.clientconsumer;
 
-import com.zakl.annotation.MqSubScribe;
 import com.zakl.dto.MqMessage;
 import com.zakl.msgdistribute.TemplateConsumer;
 import com.zakl.msgdistribute.AckClientHandler;

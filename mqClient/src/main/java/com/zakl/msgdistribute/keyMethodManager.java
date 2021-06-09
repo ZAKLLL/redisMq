@@ -1,9 +1,9 @@
 package com.zakl.msgdistribute;
 
 import cn.hutool.core.lang.UUID;
-import com.zakl.annotation.AnnotationMethodInfo;
-import com.zakl.annotation.AnnotationUtil;
-import com.zakl.annotation.MqSubScribe;
+import com.zakl.consume.AnnotationMethodInfo;
+import com.zakl.consume.AnnotationUtil;
+import com.zakl.consume.MqSubScribe;
 import com.zakl.config.ClientConfig;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.util.MqHandleUtil;

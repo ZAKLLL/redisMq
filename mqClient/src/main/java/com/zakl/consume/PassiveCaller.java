@@ -1,4 +1,4 @@
-package com.zakl.passivecall;
+package com.zakl.consume;
 
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
@@ -10,7 +10,6 @@ import com.zakl.protocol.MqSubMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.zakl.msgdistribute.MqMsgDistributor.passiveCallMsgMap;

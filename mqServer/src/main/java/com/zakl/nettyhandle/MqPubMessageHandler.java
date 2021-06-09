@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.zakl.util.MqHandleUtil.checkIfKeyValid;
-import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 
 /**
  * @author ZhangJiaKui
@@ -27,27 +26,23 @@ import static com.zakl.util.MqHandleUtil.checkIfSortedSet;
 @ChannelHandler.Sharable
 public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessage> {
 
-    private static final PubMsgBufBufHandler sBufHandler = PubMsgBufBufHandler.getInstance();
+    private static final PubMsgBufBufHandler bufHandler = PubMsgBufBufHandler.getInstance();
 
     private static final PubClientManager pubClientManager = PubClientManager.getInstance();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MqPubMessage msg) throws Exception {
-        //todo 是否在此处做心跳处理
-
 
         pubClientManager.pubClientMap.put(msg.getClientId(), ctx);
 
         log.info("receive pubMsg: {} from: {}", ctx, msg);
 
-        Map<String, List<MqMessage>> listKeyMsgs = new HashMap<>();
-        Map<String, List<MqMessage>> sortedSetKeyMsgs = new HashMap<>();
-
+        Map<String, List<MqMessage>> keyMsgs = new HashMap<>();
 
         for (Map.Entry<String, List<Pair<Double, String>>> keyPusMsgs : msg.getPubMessages().entrySet()) {
             String key = keyPusMsgs.getKey();
             List<MqMessage> msgs = new ArrayList<>();
-            if (checkIfKeyValid(key)) {
+            if (!checkIfKeyValid(key)) {
                 log.warn("keyName {} is illegal,please specify mqKey type SortedSet/List", key);
                 continue;
             }
@@ -57,13 +52,9 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
                 MqMessage mqMessage = new MqMessage(UUID.randomUUID().toString(), score, key, value);
                 msgs.add(mqMessage);
             }
-            if (checkIfSortedSet(key)) {
-                sortedSetKeyMsgs.put(key, msgs);
-            } else {
-                listKeyMsgs.put(key, msgs);
-            }
+            keyMsgs.put(key, msgs);
         }
-        sBufHandler.add( sortedSetKeyMsgs);
+        bufHandler.add(keyMsgs);
     }
 
     @Override

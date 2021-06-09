@@ -1,4 +1,4 @@
-package com.zakl.annotation;
+package com.zakl.consume;
 
 import lombok.Data;
 import lombok.ToString;

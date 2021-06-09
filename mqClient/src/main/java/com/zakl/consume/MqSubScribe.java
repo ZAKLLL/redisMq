@@ -1,4 +1,4 @@
-package com.zakl.annotation;
+package com.zakl.consume;
 
 import com.zakl.constant.Constants;
 

@@ -3,6 +3,7 @@ package com.zakl.nettyhandle;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
+import com.zakl.constant.Constants;
 import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,7 +23,9 @@ import java.util.*;
 @Slf4j
 public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqSubMessage> {
 
-    private ChannelHandlerContext ctx;
+    private static ChannelHandlerContext ctx;
+
+    private final static String clientId = UUID.randomUUID().toString();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MqSubMessage msg) throws Exception {
@@ -50,7 +53,7 @@ public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
                         mqPubMessage.setClientId(UUID.randomUUID().toString());
                         Map<String, List<Pair<Double, String>>> map = new HashMap<>();
 
-                        map.put(key, ListUtil.toList(new Pair<>(random.nextDouble() * 100, value)));
+                        map.put(Constants.MQ_SORTED_SET_PREFIX + key, ListUtil.toList(new Pair<>(random.nextDouble() * 100, value)));
                         mqPubMessage.setPubMessages(map);
                         ctx.writeAndFlush(mqPubMessage);
                         Thread.sleep(1000);
@@ -60,5 +63,13 @@ public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
             }
         }).start();
         super.channelActive(ctx);
+    }
+
+    public static ChannelHandlerContext getCtx() {
+        return ctx;
+    }
+
+    public static String getClientId() {
+        return clientId;
     }
 }

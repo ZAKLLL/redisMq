@@ -1,12 +1,8 @@
 package com.zakl;
 
-import cn.hutool.core.lang.Pair;
-import com.zakl.dto.MqMessage;
+import com.zakl.config.ClientServiceLoader;
 import com.zakl.nettyhandle.MqClientContainer;
-import com.zakl.passivecall.PassiveCaller;
-import lombok.SneakyThrows;
-
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author ZhangJiaKui
@@ -14,9 +10,17 @@ import java.util.List;
  * @description TODO
  * @date 6/4/2021 4:31 PM
  */
-public class MqPubClientStarter {
+@Slf4j
+public class MqPubClientStarter implements ClientServiceLoader {
+
+//    static {
+//        log.info("load MqPubClientStarter");
+//        new MqClientContainer(true).start();
+//    }
+
     public static void main(String[] args) {
         new MqClientContainer(true).start();
     }
+
 }
 

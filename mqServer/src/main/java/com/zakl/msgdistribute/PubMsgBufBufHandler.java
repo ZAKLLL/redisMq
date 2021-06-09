@@ -7,6 +7,7 @@ import com.zakl.statusManage.StatusManager;
 import com.zakl.util.MqHandleUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -62,8 +63,9 @@ public class PubMsgBufBufHandler {
 
     public void add(Map<String, List<MqMessage>> keyMsgs) {
         if (keyMsgs == null || keyMsgs.isEmpty()) return;
-
-        for (Map.Entry<String, List<MqMessage>> kv : keyMsgs.entrySet()) {
+        Iterator<Map.Entry<String, List<MqMessage>>> iterator = keyMsgs.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<MqMessage>> kv = iterator.next();
             String keyName = kv.getKey();
             List<MqMessage> msgs = kv.getValue();
             if (msgs.isEmpty()) continue;
@@ -73,7 +75,7 @@ public class PubMsgBufBufHandler {
             }
             Queue<MqMessage> msgBuffers = keyBufferMap.get(keyName);
             if (msgBuffers.size() + msgs.size() <= PUB_BUFFER_MAX_LIMIT) {
-                keyMsgs.remove(keyName);
+                iterator.remove();
                 add(keyName, msgs.toArray(new MqMessage[0]));
             }
             //当前key处于可消费状态

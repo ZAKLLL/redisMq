@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mqPubClient</artifactId>
+    <artifactId>mqClient</artifactId>
 
 
     <dependencies>
@@ -27,6 +27,23 @@
     </dependencies>
 
 
+<!--    &lt;!&ndash; 发布到maven私服配置 &ndash;&gt;-->
+<!--    <distributionManagement>-->
+<!--        <repository>-->
+<!--            &lt;!&ndash; ID属性与当前maven使用的配置文件中配置的server节点id一致 &ndash;&gt;-->
+<!--            <id>nexus-releases</id>-->
+<!--            <name>Packaging Release Repository</name>-->
+<!--            &lt;!&ndash; 上传目标maven私服仓库地址 &ndash;&gt;-->
+<!--            <url>http://172.16.11.132:8081/repository/maven-releases/</url>-->
+<!--        </repository>-->
+<!--        <snapshotRepository>-->
+<!--            <id>nexus-snapshots</id>-->
+<!--            <name>Packaging Snapshot Repository</name>-->
+<!--            <url>http://172.16.11.132:8081/repository/maven-snapshots/</url>-->
+<!--        </snapshotRepository>-->
+<!--    </distributionManagement>-->
+
+
     <build>
         <plugins>
             <plugin>
@@ -35,6 +52,7 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
+                    <encoding>utf-8</encoding>
                 </configuration>
             </plugin>
         </plugins>

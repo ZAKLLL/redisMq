@@ -1,7 +1,7 @@
 package com.zakl.msgdistribute;
 
-import com.zakl.annotation.AnnotationMethodInfo;
-import com.zakl.annotation.MqSubScribe;
+import com.zakl.consume.AnnotationMethodInfo;
+import com.zakl.consume.MqSubScribe;
 import com.zakl.dto.MqMessage;
 import com.zakl.nettyhandle.MqSubMessageClientHandler;
 import com.zakl.protocol.MqSubMessage;
