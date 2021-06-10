@@ -46,5 +46,10 @@ public interface Constants {
     /**
      * score for List msg to construct MqMessage(every element has a score,-1 means list data)
      */
-    Double LIST_MSG_SCORE=-1d;
+    Double LIST_MSG_SCORE = -1d;
+
+    /**
+     * heartbeat for subMsg and pubMsg
+     */
+    byte TYPE_HEARTBEAT = 0x00;
 }

@@ -31,7 +31,7 @@ public class KeyMsgDistributor implements Runnable {
     private final static Map<String, KeyMsgDistributor> keyMsgDistributeThreadMap = new HashMap<>();
 
 
-    private final Lock lock;
+    private final Lock keyHandleLock;
     private final String keyName;
     private final Condition canConsumeCondition;
     private final AtomicBoolean canConsumeFlag;
@@ -46,7 +46,7 @@ public class KeyMsgDistributor implements Runnable {
             throw new RuntimeException(errorMsg);
         }
 
-        this.lock = keyHandleLockMap.get(keyName);
+        this.keyHandleLock = keyHandleLockMap.get(keyName);
         this.canConsumeCondition = keyHandleConditionMap.get(keyName);
         this.canConsumeFlag = canConsumeStatusMap.get(keyName);
         this.keyName = keyName;
@@ -59,7 +59,7 @@ public class KeyMsgDistributor implements Runnable {
         keyMsgDistributorThread = Thread.currentThread();
         while (true) {
             try {
-                lock.lock();
+                keyHandleLock.lock();
                 while (canConsumeFlag.get()) {
                     handleRcvAndDistribute(keyName);
                 }
@@ -75,7 +75,7 @@ public class KeyMsgDistributor implements Runnable {
                 log.error("", e);
                 e.printStackTrace();
             } finally {
-                lock.unlock();
+                keyHandleLock.unlock();
             }
         }
     }

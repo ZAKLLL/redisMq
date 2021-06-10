@@ -3,9 +3,9 @@ package com.zakl.msgdistribute;
 import cn.hutool.core.collection.ListUtil;
 import com.zakl.ack.AckCallBack;
 import com.zakl.ack.AckHandlerManager;
+import com.zakl.dto.MqMessage;
 import com.zakl.protocol.MqSubMessage;
 import com.zakl.redisinteractive.RedisUtil;
-import com.zakl.dto.MqMessage;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.statusManage.SubClientInfo;
 import com.zakl.util.MqHandleUtil;
@@ -60,7 +60,7 @@ public class MsgDistributeHandler {
     private void priorityDistribute(MqMessage bufMsg, String keyName) {
         MqMessage msgToDistribute;
         ScoredValue<String> scoreValue = RedisUtil.syncSortedSetPopMax(keyName);
-        log.info("sorted set data from redis :{}", scoreValue);
+        log.info("sorted set: {} data from redis :{}", keyName, scoreValue);
         if (scoreValue.hasValue() && bufMsg != null) {
             // buf区与redis中均有数据
             // 将此信息与RedisServer 中的 max value进行比对,如果当前信息优先级更高,则分发该信息
@@ -122,12 +122,13 @@ public class MsgDistributeHandler {
         MqSubMessage mqSubMessage = new MqSubMessage();
         mqSubMessage.setType(MqSubMessage.TYPE_MQ_MESSAGE_ACTIVE_PUSH);
         mqSubMessage.setMqMessages(ListUtil.toList(mqMessage));
-        ctx.writeAndFlush(mqSubMessage);
 
 
         // ack handle non-blocking
         AckCallBack ackCallBack = new AckCallBack(mqMessage);
         AckHandlerManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
+
+        ctx.writeAndFlush(mqSubMessage);
 
     }
 }

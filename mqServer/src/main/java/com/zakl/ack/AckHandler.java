@@ -2,6 +2,7 @@ package com.zakl.ack;
 
 
 import com.zakl.statusManage.SubClientInfo;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Queue;
@@ -26,7 +27,7 @@ public class AckHandler implements Runnable {
 
     private final SubClientInfo subClientInfo;
 
-    private final ReentrantLock lock;
+    private final ReentrantLock ackHandlerLock;
 
     private final Condition condition;
 
@@ -41,8 +42,8 @@ public class AckHandler implements Runnable {
             log.error(errorMsg);
             throw new RuntimeException("need subClientInfo to create a new AckHandleThread!");
         }
-        lock = new ReentrantLock();
-        condition = lock.newCondition();
+        ackHandlerLock = new ReentrantLock();
+        condition = ackHandlerLock.newCondition();
         this.subClientInfo = subClientInfo;
     }
 
@@ -53,13 +54,14 @@ public class AckHandler implements Runnable {
         log.info("submit New AckHandleRequest,MqMsg:{}", ackCallBack.getMqMessage());
         String messageId = ackCallBack.getMqMessage().getMessageId();
         AckResponseHandler.ackCallBackMap.put(messageId, ackCallBack);
-
-        lock.lock();
+//        log.info("put ackBack:{} to ackCallBackMap", ackCallBack);
         try {
+            ackHandlerLock.lock();
+//            log.info("get lock,offer:{} back to queue", ackCallBack);
             ackCallBackQueue.offer(ackCallBack);
             condition.signal();
         } finally {
-            lock.unlock();
+            ackHandlerLock.unlock();
         }
     }
 
@@ -80,21 +82,18 @@ public class AckHandler implements Runnable {
     public void run() {
         ackHandleRealThread = Thread.currentThread();
         while (true) {
-            lock.lock();
+            ackHandlerLock.lock();
             try {
                 while (!ackCallBackQueue.isEmpty() && subClientInfo.isAlive) {
                     AckCallBack ackCallBack = ackCallBackQueue.poll();
                     ackCallBack.start(subClientInfo);
-                    //todo 是否为每个ack 开启一个线程 过于耗费性能
-                    //异步
-//                    executors.submit(() -> ackCallBack.start(subClientInfo));
                 }
                 condition.await();
             } catch (InterruptedException e) {
                 log.error("AckHandleThread be Interrupted", e);
                 break;
             } finally {
-                lock.unlock();
+                ackHandlerLock.unlock();
             }
         }
     }

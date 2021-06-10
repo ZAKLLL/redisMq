@@ -2,10 +2,10 @@ package com.zakl.nettyhandle;
 
 import com.zakl.config.ClientConfig;
 import com.zakl.container.Container;
-import com.zakl.nettyhandle.MqPubMessageClientHandler;
-import com.zakl.nettyhandle.MqSubMessageClientHandler;
+import com.zakl.protocol.IdleCheckHandler;
 import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
+import com.zakl.protocol.SupMqMessage;
 import com.zakl.protostuff.ProtostuffCodecUtil;
 import com.zakl.protostuff.ProtostuffDecoder;
 import com.zakl.protostuff.ProtostuffEncoder;
@@ -47,10 +47,13 @@ public class MqClientContainer implements Container {
         b.handler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) {
-                ProtostuffCodecUtil msgCodec = new ProtostuffCodecUtil(isPub ? MqPubMessage.class : MqSubMessage.class);
+                Class<? extends SupMqMessage> mqMsgType = isPub ? MqPubMessage.class : MqSubMessage.class;
+                String clientId = isPub ? ClientConfig.getPubClientId() : ClientConfig.getSubClientId();
+                ProtostuffCodecUtil msgCodec = new ProtostuffCodecUtil(mqMsgType);
                 ch.pipeline().addLast(new ProtostuffEncoder(msgCodec));
-                ch.pipeline().addLast(new ProtostuffDecoder(msgCodec)); //todo 添加心跳检测handler
-                ch.pipeline().addLast(isPub ? new MqPubMessageClientHandler() : new MqSubMessageClientHandler());
+                ch.pipeline().addLast(new ProtostuffDecoder(msgCodec));
+                ch.pipeline().addLast(new IdleCheckHandler(IdleCheckHandler.READ_IDLE_TIME, IdleCheckHandler.WRITE_IDLE_TIME, 0, mqMsgType, clientId));
+                ch.pipeline().addLast(NettyHandlerHelper.getSingletonHandler(mqMsgType));
             }
         });
 

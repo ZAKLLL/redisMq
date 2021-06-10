@@ -1,6 +1,7 @@
 package com.zakl.nettyhandle;
 
 import cn.hutool.core.lang.UUID;
+import com.zakl.protocol.MqPubMessage;
 import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -16,14 +17,13 @@ import java.util.*;
  * @date 5/27/2021 4:26 PM
  */
 @Slf4j
-public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqSubMessage> {
+public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqPubMessage> {
 
     private static ChannelHandlerContext context;
 
-    private final static String clientId = UUID.randomUUID().toString();
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, MqSubMessage msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, MqPubMessage msg) throws Exception {
         log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelRead0");
     }
@@ -40,7 +40,4 @@ public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqSub
         return context;
     }
 
-    public static String getClientId() {
-        return clientId;
-    }
 }

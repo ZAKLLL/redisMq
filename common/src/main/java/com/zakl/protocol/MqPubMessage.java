@@ -2,42 +2,25 @@ package com.zakl.protocol;
 
 import cn.hutool.core.lang.Pair;
 import io.protostuff.Morph;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class MqPubMessage implements Serializable {
+@ToString(callSuper = true)
+public class MqPubMessage extends SupMqMessage implements Serializable {
 
-    /**
-     * 心跳消息
-     */
-    public transient static final byte TYPE_HEARTBEAT = 0x00;
+
 
     /**
      * mq发布消息
      */
     public transient static final byte TYPE_PUBLISH = 0x01;
-
-
-    /**
-     * 消息类型
-     */
-    private byte type;
-
-    /**
-     * clientId
-     */
-    private String clientId;
-
 
     /**
      * mq推送数据

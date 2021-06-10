@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -153,16 +154,19 @@ public class StatusManager {
      */
     public static void remindDistributeThreadConsume(String keyName) {
         Condition condition = keyHandleConditionMap.get(keyName);
-        Lock lock = keyHandleLockMap.get(keyName);
+        Lock keyHandleLock = keyHandleLockMap.get(keyName);
         AtomicBoolean flag = canConsumeStatusMap.get(keyName);
         //if current state is can't consume(key is empty or client queue is empty)
-        if (!flag.get()) {
-            try {
-                lock.lock();
+        boolean success = false;
+        try {
+            success = keyHandleLock.tryLock();
+            if (success) {
                 condition.signal();
-                flag.set(true);
-            } finally {
-                lock.unlock();
+            }
+            flag.set(true);
+        } finally {
+            if (success) {
+                keyHandleLock.unlock();
             }
         }
     }

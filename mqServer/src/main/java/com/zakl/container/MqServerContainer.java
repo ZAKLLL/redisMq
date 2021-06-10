@@ -2,6 +2,9 @@ package com.zakl.container;
 
 import com.zakl.config.ServerConfig;
 import com.zakl.nettyhandle.NettyHandlerHelper;
+import com.zakl.protocol.IdleCheckHandler;
+import com.zakl.protocol.MqPubMessage;
+import com.zakl.protocol.SupMqMessage;
 import com.zakl.protostuff.ProtostuffCodecUtil;
 import com.zakl.protostuff.ProtostuffDecoder;
 import com.zakl.protostuff.ProtostuffEncoder;
@@ -30,8 +33,7 @@ public class MqServerContainer implements Container {
     private final NioEventLoopGroup serverWorkerGroup;
 
 
-
-    private final Class<?> msgType;
+    private final Class<? extends SupMqMessage> msgType;
 
     private final static Map<Class<?>, Integer> msgPortMap = new HashMap<>();
 
@@ -46,7 +48,7 @@ public class MqServerContainer implements Container {
     }
 
 
-    public MqServerContainer(NioEventLoopGroup serverBossGroup, Class msgType) {
+    public MqServerContainer(NioEventLoopGroup serverBossGroup, Class<? extends SupMqMessage> msgType) {
         this.serverWorkerGroup = new NioEventLoopGroup();
         this.serverBossGroup = serverBossGroup;
         this.msgType = msgType;
@@ -64,7 +66,8 @@ public class MqServerContainer implements Container {
                 public void initChannel(SocketChannel ch) {
                     ProtostuffCodecUtil codecUtil = new ProtostuffCodecUtil(msgType);
                     ch.pipeline().addLast(new ProtostuffEncoder(codecUtil));
-                    ch.pipeline().addLast(new ProtostuffDecoder(codecUtil)); //todo 添加心跳检测handler
+                    ch.pipeline().addLast(new ProtostuffDecoder(codecUtil));
+                    ch.pipeline().addLast(new IdleCheckHandler(IdleCheckHandler.READ_IDLE_TIME, IdleCheckHandler.WRITE_IDLE_TIME, 0, msgType, null)); //serve 端clientid为null
                     ch.pipeline().addLast(NettyHandlerHelper.getSingletonHandler(msgType));
                 }
             });

@@ -3,25 +3,18 @@ package com.zakl.protocol;
 import cn.hutool.core.lang.Pair;
 import com.zakl.dto.MqMessage;
 import io.protostuff.Morph;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class MqSubMessage implements Serializable {
-
-    /**
-     * 心跳消息
-     */
-    public transient static final byte TYPE_HEARTBEAT = 0x00;
+@ToString(callSuper = true)
+public class MqSubMessage extends SupMqMessage implements Serializable {
 
     /**
      * mq注册订阅
@@ -52,18 +45,6 @@ public class MqSubMessage implements Serializable {
      * PASSIVE_CALL
      */
     public transient static final byte PASSIVE_CALL = 0x06;
-
-
-    /**
-     * 消息类型
-     */
-    private byte type;
-
-
-    /**
-     * clientId
-     */
-    public String clientId;
 
     /**
      * clientWeight

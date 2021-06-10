@@ -29,25 +29,28 @@ public class AckCallBack {
     }
 
     public void start(SubClientInfo subClientInfo) {
-        if (finishFlag) {
-            //it means ack response before ackCallback start
-            // (because ackCall back start control by AckHandler,which  calls ackCallBack's start one by one blocking)
-            MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey()).offer(subClientInfo);
-            remindDistributeThreadConsume(mqMessage.getKey());
-            return;
-        }
-        log.info("start new Ack callBack,msg:{}", mqMessage);
         try {
             lock.lock();
-            await();
-            // current msg get target client ACkResponse
-            // push client back to clientPq
-            MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey()).offer(subClientInfo);
-            //remind  Distributor continue work
-            remindDistributeThreadConsume(mqMessage.getKey());
-        } catch (TimeoutException e) {
-            AckResponseHandler.ackBackUp(mqMessage);
-            e.printStackTrace();
+
+            if (finishFlag) {
+                //it means ack response before ackCallback start
+                // (because ackCall back start control by AckHandler,which  calls ackCallBack's start one by one blocking)
+                MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey()).offer(subClientInfo);
+                remindDistributeThreadConsume(mqMessage.getKey());
+                return;
+            }
+            log.info("start new Ack callBack,msg:{}", mqMessage);
+            try {
+                await();
+                // current msg get target client ACkResponse
+                // push client back to clientPq
+                MqKeyHandleStatusManager.keyClientsMap.get(mqMessage.getKey()).offer(subClientInfo);
+                //remind  Distributor continue work
+                remindDistributeThreadConsume(mqMessage.getKey());
+            } catch (TimeoutException e) {
+                AckResponseHandler.ackBackUp(mqMessage);
+                e.printStackTrace();
+            }
         } finally {
             lock.unlock();
         }

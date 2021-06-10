@@ -31,10 +31,10 @@ public class keyMethodManager {
     private static final Set<String> activePushKeys = new HashSet<>();
 
 
-    public static void main(String[] args) {
-        MqSubMessage mqSubMessage = genMqSubscribeMsg();
-        System.out.println(mqSubMessage);
-    }
+//    public static void main(String[] args) {
+//        MqSubMessage mqSubMessage = genMqSubscribeMsg();
+//        System.out.println(mqSubMessage);
+//    }
 
     @SneakyThrows
     public static MqSubMessage genMqSubscribeMsg() {
@@ -64,7 +64,7 @@ public class keyMethodManager {
             }
         }
         MqSubMessage mqSubMessage = new MqSubMessage();
-        mqSubMessage.setClientId(UUID.randomUUID().toString());
+        mqSubMessage.setClientId(ClientConfig.getSubClientId());
         mqSubMessage.setType(TYPE_SUBSCRIBE);
         mqSubMessage.setActivePushKeys(activePushKeys);
         return mqSubMessage;
