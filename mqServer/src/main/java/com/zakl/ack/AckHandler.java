@@ -33,8 +33,6 @@ public class AckHandler implements Runnable {
 
     private Thread ackHandleRealThread;
 
-    private final static ExecutorService executors = Executors.newCachedThreadPool();
-
 
     public AckHandler(SubClientInfo subClientInfo) {
         if (subClientInfo == null) {

@@ -53,12 +53,12 @@ public class MqMsgPassiveCallHandler {
         responseMqMsg.setType(TYPE_MQ_MESSAGE_PASSIVE_CALL);
         responseMqMsg.setPassiveCallId(msg.getPassiveCallId());
         responseMqMsg.setMqMessages(mqMessages);
-        ctx.writeAndFlush(responseMqMsg);
         //todo 验证主动调用ack
         for (MqMessage mqMessage : mqMessages) {
             AckCallBack ackCallBack = new AckCallBack(mqMessage);
             AckHandlerManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
         }
+        ctx.writeAndFlush(responseMqMsg);
     }
 
     private static List<MqMessage> fifoMsgPassiveCallHandle(String keyName, Integer cnt) {
