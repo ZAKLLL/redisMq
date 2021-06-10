@@ -2,10 +2,13 @@ package com.zakl.ack;
 
 
 import com.zakl.statusManage.SubClientInfo;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -20,12 +23,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AckHandler implements Runnable {
 
 
-
     private final Queue<AckCallBack> ackCallBackQueue = new ConcurrentLinkedQueue<>();
 
     private final SubClientInfo subClientInfo;
 
-    private final ReentrantLock lock;
+    private final ReentrantLock ackHandlerLock;
 
     private final Condition condition;
 
@@ -38,8 +40,8 @@ public class AckHandler implements Runnable {
             log.error(errorMsg);
             throw new RuntimeException("need subClientInfo to create a new AckHandleThread!");
         }
-        lock = new ReentrantLock();
-        condition = lock.newCondition();
+        ackHandlerLock = new ReentrantLock();
+        condition = ackHandlerLock.newCondition();
         this.subClientInfo = subClientInfo;
     }
 
@@ -50,13 +52,14 @@ public class AckHandler implements Runnable {
         log.info("submit New AckHandleRequest,MqMsg:{}", ackCallBack.getMqMessage());
         String messageId = ackCallBack.getMqMessage().getMessageId();
         AckResponseHandler.ackCallBackMap.put(messageId, ackCallBack);
-
-        lock.lock();
+//        log.info("put ackBack:{} to ackCallBackMap", ackCallBack);
         try {
+            ackHandlerLock.lock();
+//            log.info("get lock,offer:{} back to queue", ackCallBack);
             ackCallBackQueue.offer(ackCallBack);
             condition.signal();
         } finally {
-            lock.unlock();
+            ackHandlerLock.unlock();
         }
     }
 
@@ -77,7 +80,7 @@ public class AckHandler implements Runnable {
     public void run() {
         ackHandleRealThread = Thread.currentThread();
         while (true) {
-            lock.lock();
+            ackHandlerLock.lock();
             try {
                 while (!ackCallBackQueue.isEmpty() && subClientInfo.isAlive) {
                     AckCallBack ackCallBack = ackCallBackQueue.poll();
@@ -88,7 +91,7 @@ public class AckHandler implements Runnable {
                 log.error("AckHandleThread be Interrupted", e);
                 break;
             } finally {
-                lock.unlock();
+                ackHandlerLock.unlock();
             }
         }
     }

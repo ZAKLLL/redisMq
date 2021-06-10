@@ -2,6 +2,7 @@ package com.zakl.consume;
 
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
+import com.zakl.config.ClientConfig;
 import com.zakl.constant.Constants;
 import com.zakl.dto.MqMessage;
 import com.zakl.msgdistribute.MessageCallBack;
@@ -33,6 +34,7 @@ public class PassiveCaller {
         MqSubMessage passiveCallRequest = new MqSubMessage();
         passiveCallRequest.setType(MqSubMessage.PASSIVE_CALL);
         passiveCallRequest.setPassiveCallId(passiveCallId);
+        passiveCallRequest.setClientId(ClientConfig.getSubClientId());
         List<Pair<String, Integer>> passiveCallKeys = new ArrayList<>();
         for (Pair<String, Integer> kv : keyAndExceptCounts) {
             String key = kv.getKey();

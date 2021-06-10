@@ -31,7 +31,7 @@ public class AckResponseHandler {
      * @param mqMessage
      */
     public static void handleAckSuccessFailed(MqMessage mqMessage) {
-        ackCallBackMap.remove(mqMessage.getKey());
+        ackCallBackMap.remove(mqMessage.getMessageId());
         //重新发送到ACK中
         RedisUtil.syncSortedSetAdd(mqMessage);
     }
@@ -43,7 +43,7 @@ public class AckResponseHandler {
 
     public static void cleanAckBackUp(MqMessage mqMessage) {
         RedisUtil.syncSetRemove(ACK_SET_KEY, mqMessage);
-        log.info("从redis 清除确认ACK信息的消息: {} ", mqMessage);
+        log.info("ackSet  清除确认ACK信息的消息: {} ", mqMessage);
     }
 
 

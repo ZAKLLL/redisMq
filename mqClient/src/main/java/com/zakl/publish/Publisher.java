@@ -1,6 +1,7 @@
 package com.zakl.publish;
 
 import cn.hutool.core.lang.Pair;
+import com.zakl.config.ClientConfig;
 import com.zakl.constant.Constants;
 import com.zakl.nettyhandle.MqPubMessageClientHandler;
 import com.zakl.protocol.MqPubMessage;
@@ -24,13 +25,12 @@ import static com.zakl.protocol.MqPubMessage.TYPE_PUBLISH;
 @Slf4j
 public class Publisher {
 
-    private final static String clientId = MqPubMessageClientHandler.getClientId();
 
 
     public static void publishToKey(Map<String, List<Pair<Double, String>>> keyValues) {
         log.info("publish msg:{} to server", keyValues);
         MqPubMessage mqPubMessage = new MqPubMessage();
-        mqPubMessage.setClientId(clientId);
+        mqPubMessage.setClientId(ClientConfig.getPubClientId());
         mqPubMessage.setType(TYPE_PUBLISH);
         mqPubMessage.setPubMessages(keyValues);
         MqPubMessageClientHandler.getContext().writeAndFlush(mqPubMessage);

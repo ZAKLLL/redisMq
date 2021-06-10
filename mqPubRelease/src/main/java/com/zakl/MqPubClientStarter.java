@@ -1,13 +1,14 @@
 package com.zakl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
 import com.zakl.config.ClientServiceLoader;
-import com.zakl.consume.PassiveCaller;
 import com.zakl.nettyhandle.MqClientContainer;
 import com.zakl.publish.Publisher;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -32,12 +33,13 @@ public class MqPubClientStarter implements ClientServiceLoader {
             @SneakyThrows
             @Override
             public void run() {
+                Thread.sleep(5000);
                 while (true) {
-                    Thread.sleep(5000);
-                    String[] keys = {"k1", "k2", "k3", "k4"};
+                    Thread.sleep(1000);
+                    String[] keys = {"k1"};
                     for (String key : keys) {
-                        String value = "HelloWorld" + System.currentTimeMillis();
-                        Publisher.publishToSortedSetKey(key,new Pair<>(random.nextDouble()*100,value));
+                        String value = "HelloWorld" + DateUtil.format(new Date(),"yyyy/MM/dd HH:mm:ss");
+                        Publisher.publishToSortedSetKey(key, new Pair<>(random.nextDouble() * 100, value));
                     }
                 }
             }

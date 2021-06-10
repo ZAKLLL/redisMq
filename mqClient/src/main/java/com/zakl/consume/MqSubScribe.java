@@ -33,11 +33,11 @@ public @interface MqSubScribe {
     KeyTypeEnum keyType() default KeyTypeEnum.SORTEDSET;
 
 
-    /**
-     * todo 实现
-     * 期望单次推送收到的消息数(当消息不足expectCnt的时候,返回最大消息数)
-     */
-    int expectCnt() default 1;
+//    /**
+//     * todo 实现
+//     * 期望单次推送收到的消息数(当消息不足expectCnt的时候,返回最大消息数)
+//     */
+//    int expectCnt() default 1;
 
     /**
      * 是否自动开启ACK

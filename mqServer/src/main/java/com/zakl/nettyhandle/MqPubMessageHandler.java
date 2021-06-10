@@ -2,10 +2,14 @@ package com.zakl.nettyhandle;
 
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.UUID;
+import com.zakl.constant.Constants;
 import com.zakl.dto.MqMessage;
 import com.zakl.msgdistribute.PubMsgBufBufHandler;
 import com.zakl.protocol.MqPubMessage;
+import com.zakl.protocol.MqSubMessage;
+import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.statusManage.PubClientManager;
+import com.zakl.statusManage.StatusManager;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -32,6 +36,10 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MqPubMessage msg) throws Exception {
+        if (msg.getType() == Constants.TYPE_HEARTBEAT) {
+            handleHeartbeatMessage(ctx);
+            return;
+        }
 
         pubClientManager.pubClientMap.put(msg.getClientId(), ctx);
 
@@ -40,19 +48,21 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
         Map<String, List<MqMessage>> keyMsgs = new HashMap<>();
 
         for (Map.Entry<String, List<Pair<Double, String>>> keyPusMsgs : msg.getPubMessages().entrySet()) {
-            String key = keyPusMsgs.getKey();
+            String keyName = keyPusMsgs.getKey();
             List<MqMessage> msgs = new ArrayList<>();
-            if (!checkIfKeyValid(key)) {
-                log.warn("keyName {} is illegal,please specify mqKey type SortedSet/List", key);
+            if (!checkIfKeyValid(keyName)) {
+                log.warn("keyName {} is illegal,please specify mqKey type SortedSet/List", keyName);
                 continue;
+            } else if (!MqKeyHandleStatusManager.keyClientsMap.containsKey(keyName)) {
+                StatusManager.initNewKey(keyName);
             }
             for (Pair<Double, String> scoreAndValue : keyPusMsgs.getValue()) {
                 double score = scoreAndValue.getKey();
                 String value = scoreAndValue.getValue();
-                MqMessage mqMessage = new MqMessage(UUID.randomUUID().toString(), score, key, value);
+                MqMessage mqMessage = new MqMessage(UUID.randomUUID().toString(), score, keyName, value);
                 msgs.add(mqMessage);
             }
-            keyMsgs.put(key, msgs);
+            keyMsgs.put(keyName, msgs);
         }
         bufHandler.add(keyMsgs);
     }
@@ -78,4 +88,10 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
         ctx.close();
     }
 
+    private void handleHeartbeatMessage(ChannelHandlerContext ctx) {
+        MqPubMessage mqSubMessage = new MqPubMessage();
+        mqSubMessage.setType(Constants.TYPE_HEARTBEAT);
+        log.debug("response heartbeat message {}", ctx.channel());
+        ctx.channel().writeAndFlush(mqSubMessage);
+    }
 }

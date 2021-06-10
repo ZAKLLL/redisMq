@@ -53,12 +53,12 @@ public class MqMsgPassiveCallHandler {
         responseMqMsg.setType(TYPE_MQ_MESSAGE_PASSIVE_CALL);
         responseMqMsg.setPassiveCallId(msg.getPassiveCallId());
         responseMqMsg.setMqMessages(mqMessages);
-        ctx.writeAndFlush(responseMqMsg);
         //todo 验证主动调用ack
         for (MqMessage mqMessage : mqMessages) {
             AckCallBack ackCallBack = new AckCallBack(mqMessage);
             AckHandlerManager.getClientAckHandler(subClientInfo).submitNewAckHandleRequest(ackCallBack);
         }
+        ctx.writeAndFlush(responseMqMsg);
     }
 
     private static List<MqMessage> fifoMsgPassiveCallHandle(String keyName, Integer cnt) {
@@ -67,7 +67,7 @@ public class MqMsgPassiveCallHandler {
         int tmtCnt = 0;
         List<String> redisMsgs = RedisUtil.syncListRPop(keyName, cnt);
         tmtCnt += redisMsgs.size();
-        redisMsgs.forEach(i -> ret.add(MqHandleUtil.convertRedisStringToMqMessage(keyName, -1, i)));
+        redisMsgs.forEach(msg -> ret.add(MqHandleUtil.convertRedisStringToMqMessage(keyName, -1, msg)));
         while (tmtCnt++ < cnt) {
             MqMessage mqMessage = bufBufHandler.listen(keyName);
             if (mqMessage == null) {
