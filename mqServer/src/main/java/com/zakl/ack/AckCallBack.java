@@ -2,7 +2,6 @@ package com.zakl.ack;
 
 import com.zakl.dto.MqMessage;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
-import com.zakl.statusManage.StatusManager;
 import com.zakl.statusManage.SubClientInfo;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,8 +16,8 @@ import static com.zakl.statusManage.StatusManager.remindDistributeThreadConsume;
 @Slf4j
 public class AckCallBack {
 
-    private final Lock lock = new ReentrantLock();
-    private final Condition finish = lock.newCondition();
+    private final Lock ackCallBackLock = new ReentrantLock();
+    private final Condition finish = ackCallBackLock.newCondition();
 
     private volatile boolean finishFlag = false;
 
@@ -30,7 +29,7 @@ public class AckCallBack {
 
     public void start(SubClientInfo subClientInfo) {
         try {
-            lock.lock();
+            ackCallBackLock.lock();
 
             if (finishFlag) {
                 //it means ack response before ackCallback start
@@ -52,19 +51,19 @@ public class AckCallBack {
                 e.printStackTrace();
             }
         } finally {
-            lock.unlock();
+            ackCallBackLock.unlock();
         }
     }
 
     public void over(byte ackType) {
         try {
-            lock.lock();
+            ackCallBackLock.lock();
             AckResponseHandler.handleAckSuccessFully(mqMessage, ackType);
             AckResponseHandler.cleanAckBackUp(mqMessage);
             finishFlag = true;
             finish.signal();
         } finally {
-            lock.unlock();
+            ackCallBackLock.unlock();
         }
     }
 
