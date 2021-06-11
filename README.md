@@ -34,9 +34,14 @@
 
   + 根据 common->mqServer->mqClient->mqPubRelease->mqSubRelease 的顺序,依次于各模块包之下编译安装
 
+    + jar包导入方式
     + ```shell
       mvn clean install
       ```
+    + 独立服务方式
+    + ```shell
+       mvn clean compile assembly:single
+      ``` 
 
 + 服务端部署:
 

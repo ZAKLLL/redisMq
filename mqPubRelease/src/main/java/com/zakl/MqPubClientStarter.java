@@ -2,7 +2,6 @@ package com.zakl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
-import com.zakl.config.ClientServiceLoader;
 import com.zakl.nettyhandle.MqClientContainer;
 import com.zakl.publish.Publisher;
 import lombok.SneakyThrows;
@@ -18,7 +17,7 @@ import java.util.Random;
  * @date 6/4/2021 4:31 PM
  */
 @Slf4j
-public class MqPubClientStarter implements ClientServiceLoader {
+public class MqPubClientStarter implements MqServiceLoader {
 
 //    static {
 //        log.info("load com.zakl.MqPubClientStarter");

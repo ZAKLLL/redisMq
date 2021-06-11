@@ -1,4 +1,4 @@
-package com.zakl.config;
+package com.zakl;
 
 /**
  * @author ZhangJiaKui
@@ -6,6 +6,6 @@ package com.zakl.config;
  * @description TODO
  * @date 6/9/2021 10:41 AM
  */
-public interface ClientServiceLoader {
+public interface MqServiceLoader {
 
 }
