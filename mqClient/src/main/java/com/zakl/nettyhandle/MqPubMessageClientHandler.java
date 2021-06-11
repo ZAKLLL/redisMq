@@ -1,8 +1,7 @@
 package com.zakl.nettyhandle;
 
-import cn.hutool.core.lang.UUID;
+import com.zakl.msgpublish.PubAckHandler;
 import com.zakl.protocol.MqPubMessage;
-import com.zakl.protocol.MqSubMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +21,14 @@ public class MqPubMessageClientHandler extends SimpleChannelInboundHandler<MqPub
     private static ChannelHandlerContext context;
 
 
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MqPubMessage msg) throws Exception {
         log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelRead0");
+        if (msg.getType() == MqPubMessage.TYPE_ACK) {
+            PubAckHandler.confirm(msg);
+        }
     }
 
     @Override

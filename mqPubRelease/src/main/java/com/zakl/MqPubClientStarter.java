@@ -19,10 +19,10 @@ import java.util.Random;
 @Slf4j
 public class MqPubClientStarter implements MqServiceLoader {
 
-//    static {
-//        log.info("load com.zakl.MqPubClientStarter");
-//        new MqClientContainer(true).start();
-//    }
+    static {
+        log.info("load com.zakl.MqPubClientStarter");
+        new MqClientContainer(true).start();
+    }
 
     public static void main(String[] args) {
 
@@ -32,19 +32,18 @@ public class MqPubClientStarter implements MqServiceLoader {
             @SneakyThrows
             @Override
             public void run() {
-                Thread.sleep(5000);
+                Thread.sleep(2000);
                 while (true) {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                     String[] keys = {"k1"};
                     for (String key : keys) {
-                        String value = "HelloWorld" + DateUtil.format(new Date(),"yyyy/MM/dd HH:mm:ss");
-                        Publisher.publishToSortedSetKey(key, new Pair<>(random.nextDouble() * 100, value));
+                        String value = "HelloWorld" + DateUtil.format(new Date(), "yyyy/MM/dd HH:mm:ss");
+                        boolean b = Publisher.publishToSortedSetKey(key, new Pair<>(random.nextDouble() * 100, value));
+                        System.out.println("发送---->" + b);
                     }
                 }
             }
         }).start();
-        new MqClientContainer(true).start();
-
     }
 
 }

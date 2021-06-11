@@ -1,6 +1,5 @@
 package com.zakl;
 
-import com.zakl.MqServiceLoader;
 import com.zakl.container.ContainerHelper;
 import com.zakl.container.MqServerContainer;
 import com.zakl.protocol.MqPubMessage;
@@ -28,7 +27,7 @@ public class RedisMqStarter implements MqServiceLoader {
 
     static {
 
-        log.info("loading com.zakl.com.zakl.RedisMqStarter");
+        log.info("loading com.zakl.RedisMqStarter");
 
         initServerData();
 

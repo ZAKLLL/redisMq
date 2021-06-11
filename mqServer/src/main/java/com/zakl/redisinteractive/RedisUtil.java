@@ -28,6 +28,7 @@ import static com.zakl.util.MqHandleUtil.convertMqMessageToJsonDate;
 public class RedisUtil {
     private static final GenericObjectPool<StatefulRedisConnection<String, String>> pool;
 
+    //NX: Don't update already existing elements. Always add new elements.
     private static final ZAddArgs nx = new ZAddArgs().nx();
 
 
