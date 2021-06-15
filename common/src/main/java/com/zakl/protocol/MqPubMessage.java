@@ -16,22 +16,22 @@ import java.util.Map;
 public class MqPubMessage extends SupMqMessage implements Serializable {
 
 
-
     /**
      * mq发布消息
      */
     public transient static final byte TYPE_PUBLISH = 0x01;
 
     /**
-     * mq推送数据
-     * key->mq_key
-     * value->{
-     * value.key->score (-1 表示当前数据分发到 MQ_LIST:key)
-     * value.key->score (>=0 表示当前数据分发到 MQ_SORTED_SET:key)
-     * }
+     * ack
      */
+    public transient static final byte TYPE_ACK = 0x04;
+
     @Morph
     private Map<String, List<Pair<Double, String>>> pubMessages;
 
+    /**
+     * push ack id,ensure mqServer receive  pubMessages;
+     */
+    private String pubId;
 
 }

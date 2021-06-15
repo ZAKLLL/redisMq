@@ -1,6 +1,5 @@
 package com.zakl.msgdistribute;
 
-import cn.hutool.core.lang.UUID;
 import com.zakl.consume.AnnotationMethodInfo;
 import com.zakl.consume.AnnotationUtil;
 import com.zakl.consume.MqSubScribe;
@@ -43,6 +42,7 @@ public class keyMethodManager {
         log.info("scan consume Method successfully");
         fillTargetObjet(annotationMethodInfos);
         for (AnnotationMethodInfo<MqSubScribe> annotationMethodInfo : annotationMethodInfos) {
+            log.info("init consumer method:{}", annotationMethodInfo);
             MqSubScribe annotation = annotationMethodInfo.getAnnotation();
             Method method = annotationMethodInfo.getMethod();
 
@@ -64,7 +64,7 @@ public class keyMethodManager {
             }
         }
         MqSubMessage mqSubMessage = new MqSubMessage();
-        mqSubMessage.setClientId(ClientConfig.getSubClientId());
+        mqSubMessage.setClientId(ClientConfig.getClientId());
         mqSubMessage.setType(TYPE_SUBSCRIBE);
         mqSubMessage.setActivePushKeys(activePushKeys);
         return mqSubMessage;

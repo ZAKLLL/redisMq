@@ -3,14 +3,13 @@ package com.zakl.publish;
 import cn.hutool.core.lang.Pair;
 import com.zakl.config.ClientConfig;
 import com.zakl.constant.Constants;
+import com.zakl.msgpublish.PubAckCallBack;
+import com.zakl.msgpublish.PubAckHandler;
 import com.zakl.nettyhandle.MqPubMessageClientHandler;
 import com.zakl.protocol.MqPubMessage;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,26 +25,28 @@ import static com.zakl.protocol.MqPubMessage.TYPE_PUBLISH;
 public class Publisher {
 
 
-
-    public static void publishToKey(Map<String, List<Pair<Double, String>>> keyValues) {
+    public static boolean publishToKey(Map<String, List<Pair<Double, String>>> keyValues) {
         log.info("publish msg:{} to server", keyValues);
+        String pubId = UUID.randomUUID().toString();
         MqPubMessage mqPubMessage = new MqPubMessage();
-        mqPubMessage.setClientId(ClientConfig.getPubClientId());
+        mqPubMessage.setPubId(pubId);
+        mqPubMessage.setClientId(ClientConfig.getClientId());
         mqPubMessage.setType(TYPE_PUBLISH);
         mqPubMessage.setPubMessages(keyValues);
         MqPubMessageClientHandler.getContext().writeAndFlush(mqPubMessage);
+        return PubAckHandler.submitAckCallBack(new PubAckCallBack(pubId));
     }
 
     @SafeVarargs
-    public static void publishToSortedSetKey(String key, Pair<Double, String>... values) {
+    public static boolean publishToSortedSetKey(String key, Pair<Double, String>... values) {
         final String sortedSetKey = Constants.MQ_SORTED_SET_PREFIX + key;
         Map<String, List<Pair<Double, String>>> keyValues = new HashMap<>();
         keyValues.put(sortedSetKey, Arrays.asList(values.clone()));
-        publishToKey(keyValues);
+        return publishToKey(keyValues);
     }
 
 
-    public static void publishToListKey(String key, String... values) {
+    public static boolean publishToListKey(String key, String... values) {
         final String sortedSetKey = Constants.MQ_LIST_PREFIX + key;
         Map<String, List<Pair<Double, String>>> keyValues = new HashMap<String, List<Pair<Double, String>>>() {
             {
@@ -53,7 +54,7 @@ public class Publisher {
                 put(sortedSetKey, scoredValues);
             }
         };
-        publishToKey(keyValues);
+        return publishToKey(keyValues);
     }
 
 

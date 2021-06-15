@@ -11,6 +11,7 @@
 
     <artifactId>mqServer</artifactId>
     <build>
+        <finalName>RedisMqServer</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -21,7 +22,32 @@
                     <encoding>utf-8</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>
+                        RedisMqServer
+                    </finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.zakl.RedisMqStarter</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!--                默认以独立服务运行,取消下方注解,表示以jar-->
+                <!--                <includes>-->
+                <!--                    <include>META-INF/**</include>-->
+                <!--                </includes>-->
+            </resource>
+        </resources>
     </build>
 
 

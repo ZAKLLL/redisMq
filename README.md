@@ -24,7 +24,7 @@
 
 
 + 系统架构:
-  + ![image-20210610164625225](appachment/image-20210610164625225.png)
+  + ![image-20210610164625225](attachment/image-20210610164625225.png)
 
 
 
@@ -34,8 +34,13 @@
 
   + 根据 common->mqServer->mqClient->mqPubRelease->mqSubRelease 的顺序,依次于各模块包之下编译安装
 
+    + jar包导入方式
     + ```shell
       mvn clean install
+      ```
+    + 独立服务方式
+    + ```shell
+       mvn clean compile assembly:single
       ```
 
 + 服务端部署:
@@ -77,22 +82,18 @@
 
          ```properties
          server.mqPubPort=5000
-         
-         ```
-
-  server.mqSubPort=6000
-         
+         server.mqSubPort=6000
+                  
          #MqServer memory buf size,
          # if 0,mean pubMsg will be direct deliver to redisServer,not buffer in MqServer' memory,(less performance ,better consistency)
-         # suggested value 10000,depends on your server memory
          server.MqSubMsgBufSize=5
-         
+                  
          # RedisConfig
-         
+                  
          redis.host=172.25.189.166
-         
+                  
          redis.port=6379
-         
+                  
          redis.pwd=
          
          redis.db=7
@@ -146,14 +147,14 @@
     server.mqSubPort=6000
     
     # 消费端自动消费(使用MqSubscribe) 方法所在包名
-    client.consumerPackage=com.zakl.consume
+    client.consumerPackage=com.zakl.consumer
     ```
 
 + 代码示例:
 
   + 生产者:
 
-    + 像K1,k2队列发送具有优先级的消息数据.
+    + 向K1,k2队列发送具有优先级的消息数据.
     
       ```java
         public static void main(String[] args) {
@@ -233,8 +234,8 @@
 
 ### todo
 
-1. Server端的服务注册
-2. Server端Docker容器部署
+1. Server端的服务注册  			√
+2. Server端Docker容器部署 
 
 
 

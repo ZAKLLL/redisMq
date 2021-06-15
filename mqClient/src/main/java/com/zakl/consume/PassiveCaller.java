@@ -34,7 +34,7 @@ public class PassiveCaller {
         MqSubMessage passiveCallRequest = new MqSubMessage();
         passiveCallRequest.setType(MqSubMessage.PASSIVE_CALL);
         passiveCallRequest.setPassiveCallId(passiveCallId);
-        passiveCallRequest.setClientId(ClientConfig.getSubClientId());
+        passiveCallRequest.setClientId(ClientConfig.getClientId());
         List<Pair<String, Integer>> passiveCallKeys = new ArrayList<>();
         for (Pair<String, Integer> kv : keyAndExceptCounts) {
             String key = kv.getKey();

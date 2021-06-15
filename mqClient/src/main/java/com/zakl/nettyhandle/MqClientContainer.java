@@ -48,11 +48,11 @@ public class MqClientContainer implements Container {
             @Override
             protected void initChannel(NioSocketChannel ch) {
                 Class<? extends SupMqMessage> mqMsgType = isPub ? MqPubMessage.class : MqSubMessage.class;
-                String clientId = isPub ? ClientConfig.getPubClientId() : ClientConfig.getSubClientId();
+
                 ProtostuffCodecUtil msgCodec = new ProtostuffCodecUtil(mqMsgType);
                 ch.pipeline().addLast(new ProtostuffEncoder(msgCodec));
                 ch.pipeline().addLast(new ProtostuffDecoder(msgCodec));
-                ch.pipeline().addLast(new IdleCheckHandler(IdleCheckHandler.READ_IDLE_TIME, IdleCheckHandler.WRITE_IDLE_TIME, 0, mqMsgType, clientId));
+                ch.pipeline().addLast(new IdleCheckHandler(IdleCheckHandler.READ_IDLE_TIME, IdleCheckHandler.WRITE_IDLE_TIME, 0, mqMsgType, ClientConfig.getClientId()));
                 ch.pipeline().addLast(NettyHandlerHelper.getSingletonHandler(mqMsgType));
             }
         });
