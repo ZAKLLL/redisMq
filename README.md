@@ -7,6 +7,8 @@
 + redisMq:一个基于Netty网络通信,Redis(5.0及以上),的简单消息队列实现,拥有如下特点.
   + **不错的网络性能**: 
     + 基于**Netty4.1.56final** 进行网络异步通信,提供了海量并发能力。
+  + **Direct消费模式**:
+    + 此项目只提供类似于RabbitMq的Direct消费模式,即投递到具体的Key,且注册消费当前key的subClient才可进行调用.
   + **基于REDIS**: 
     + redis提供的高效缓存能力,以及RDB/AOF持久化解决方案,使得可通过配置,得到性能与数据不丢失的权衡.
   + **FIFO模型**: 
@@ -24,6 +26,19 @@
 
 
 + 系统架构:
+   
+  + ```├── LICENSE
+       ├── README.md
+       ├── attachment     # 文档附件
+       ├── common         # 通用包，包含部分Util，数据序列化协议,服务注册接口
+       ├── mqClient       # 客户端核心包,提供Pub/Sub具体功能实现
+       ├── mqPubRelease   # 生产者API包，封装对外发布
+       ├── mqServer       # RedisMq 服务端包，负责处理数据接口及数据分发
+       ├── mqSubRelease   # 消费者API包，封装对外发布
+       ├── pom.xml
+       └── redisMq.iml
+    ```
+
   + ![image-20210610164625225](attachment/image-20210610164625225.png)
 
 
