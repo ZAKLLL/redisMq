@@ -35,12 +35,15 @@ public class RedisConfig {
 
     public final static Integer db;
 
+    public final static int poolSize;
+
 
     static {
         host = ConfigUtil.getInstance().getStringValue("redis.host");
         port = ConfigUtil.getInstance().getIntValue("redis.port");
         pwd = ConfigUtil.getInstance().getStringValue("redis.pwd");
         db = ConfigUtil.getInstance().getIntValue("redis.db");
+        poolSize = ConfigUtil.getInstance().getIntValue("redis.poolSize",100);
 
         log.info(
                 "config init redisServer info host {}, port {}, pwd {} ,db{}",

@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
-import java.time.chrono.MinguoChronology;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,8 +36,7 @@ public class RedisUtil {
         log.info("initializing the Lettuce pool ");
 
         GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig = new GenericObjectPoolConfig<>();
-        poolConfig.setMaxIdle(600);
-
+        poolConfig.setMaxTotal(RedisConfig.poolSize);
         RedisClient client = RedisClient.create(String.format("redis://%s@%s:%d/%d", RedisConfig.pwd, RedisConfig.host, RedisConfig.port, RedisConfig.db));
 
         pool = ConnectionPoolSupport.createGenericObjectPool(

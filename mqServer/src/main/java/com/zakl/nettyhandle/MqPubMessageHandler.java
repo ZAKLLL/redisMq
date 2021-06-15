@@ -6,7 +6,6 @@ import com.zakl.constant.Constants;
 import com.zakl.dto.MqMessage;
 import com.zakl.msgdistribute.PubMsgBufBufHandler;
 import com.zakl.protocol.MqPubMessage;
-import com.zakl.protocol.MqSubMessage;
 import com.zakl.statusManage.MqKeyHandleStatusManager;
 import com.zakl.statusManage.PubClientManager;
 import com.zakl.statusManage.StatusManager;
@@ -39,9 +38,7 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
 
         log.info("[" + ctx.channel().id() + "]" + new SimpleDateFormat("yyyy/MM/dd HH/mm/ss").format(new Date()) + "==>>>"
                 + "channelRead0");
-        if (msg.getType() == Constants.TYPE_HEARTBEAT) {
-            handleHeartbeatMessage(ctx);
-        } else if (msg.getType() == MqPubMessage.TYPE_PUBLISH) {
+        if (msg.getType() == MqPubMessage.TYPE_PUBLISH) {
             handlePubMsgs(ctx, msg);
         }
 
@@ -68,12 +65,6 @@ public class MqPubMessageHandler extends SimpleChannelInboundHandler<MqPubMessag
         ctx.close();
     }
 
-    private void handleHeartbeatMessage(ChannelHandlerContext ctx) {
-        MqPubMessage mqSubMessage = new MqPubMessage();
-        mqSubMessage.setType(Constants.TYPE_HEARTBEAT);
-        log.debug("response heartbeat message {}", ctx.channel());
-        ctx.channel().writeAndFlush(mqSubMessage);
-    }
 
     private void handlePubMsgs(ChannelHandlerContext ctx, MqPubMessage msg) {
 
