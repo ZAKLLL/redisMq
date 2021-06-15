@@ -30,7 +30,7 @@ public class Publisher {
         String pubId = UUID.randomUUID().toString();
         MqPubMessage mqPubMessage = new MqPubMessage();
         mqPubMessage.setPubId(pubId);
-        mqPubMessage.setClientId(ClientConfig.getPubClientId());
+        mqPubMessage.setClientId(ClientConfig.getClientId());
         mqPubMessage.setType(TYPE_PUBLISH);
         mqPubMessage.setPubMessages(keyValues);
         MqPubMessageClientHandler.getContext().writeAndFlush(mqPubMessage);

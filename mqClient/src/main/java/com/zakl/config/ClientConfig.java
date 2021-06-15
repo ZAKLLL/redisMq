@@ -42,30 +42,26 @@ public class ClientConfig implements Serializable {
     private static final String consumePackage;
 
     /**
-     * clientId for pubClient (uuid)
+     * clientId for client (uuid)
      */
-    private static final String pubClientId;
+    private static final String clientId;
 
-    /**
-     * clientId for subClient (uuid)
-     */
-    private static final String subClientId;
 
     static {
-        mqPubPort = ConfigUtil.getInstance().getIntValue("server.mqPubPort");
-
-        mqSubPort = ConfigUtil.getInstance().getIntValue("server.mqSubPort");
 
         serverIp = ConfigUtil.getInstance().getStringValue("server.ip");
 
+        mqPubPort = ConfigUtil.getInstance().getIntValue("server.mqPubPort", 5000);
+
+        mqSubPort = ConfigUtil.getInstance().getIntValue("server.mqSubPort", 6000);
+
         consumePackage = ConfigUtil.getInstance().getStringValue("client.consumerPackage");
 
-        pubClientId = UUID.randomUUID().toString();
+        clientId = UUID.randomUUID().toString();
 
-        subClientId = UUID.randomUUID().toString();
         log.info(
-                "\nconfig init serverIp: {} \n mqPubPort: {} \n mqSubPort: {} \n consumePackage: {} \n pubClientId(uuid): {} \n subClientId(uuid): {}",
-                serverIp, mqPubPort, mqSubPort, consumePackage, pubClientId, subClientId);
+                "\nconfig init serverIp: {} \n mqPubPort: {} \n mqSubPort: {} \n consumerPackage: {} \n clientId(uuid): {} \n",
+                serverIp, mqPubPort, mqSubPort, consumePackage, clientId);
     }
 
     public static String getServerIp() {
@@ -84,11 +80,8 @@ public class ClientConfig implements Serializable {
         return consumePackage;
     }
 
-    public static String getPubClientId() {
-        return pubClientId;
+    public static String getClientId() {
+        return clientId;
     }
 
-    public static String getSubClientId() {
-        return subClientId;
-    }
 }
