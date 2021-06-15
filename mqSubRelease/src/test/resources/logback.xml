@@ -6,11 +6,15 @@
 <configuration scan="true" scanPeriod="10 seconds">
 
 
-    <contextName>mqServer</contextName>
+    <contextName>mqClient</contextName>
     <property name="LOG_PATH" value="D:/applicationLog/redismq/server"/>
     <!-- 彩色日志 -->
     <!-- 彩色日志依赖的渲染类 -->
     <conversionRule conversionWord="clr"
+                    converterClass="ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter"/>
+    <conversionRule conversionWord="wEx"
                     converterClass="ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter"/>
     <!-- 彩色日志格式 -->
     <property name="CONSOLE_LOG_PATTERN"
@@ -22,7 +26,7 @@
               class="ch.qos.logback.core.ConsoleAppender">
         <!--此日志appender是为开发使用，只配置最底级别，控制台输出的日志级别是大于或等于此级别的日志信息 -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>trace</level>
+            <level>DEBUG</level>
         </filter>
         <encoder>
             <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
@@ -164,6 +168,7 @@
             <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
+
 
 
     <root level="info">

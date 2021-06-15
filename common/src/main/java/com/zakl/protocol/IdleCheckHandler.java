@@ -34,14 +34,14 @@ public class IdleCheckHandler extends IdleStateHandler {
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         if (IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT == evt) {
-//            log.debug("channel write idle state {}", ctx.channel());
-//            SupMqMessage heartBeatMsg = this.mqMessageType.newInstance();
-//            heartBeatMsg.setType(Constants.TYPE_HEARTBEAT);
-//            heartBeatMsg.setClientId(clientId);
-//            ctx.channel().writeAndFlush(heartBeatMsg);
+            log.info("channel write idle state {}", ctx.channel());
+            SupMqMessage heartBeatMsg = this.mqMessageType.newInstance();
+            heartBeatMsg.setType(Constants.TYPE_HEARTBEAT);
+            heartBeatMsg.setClientId(clientId);
+            ctx.channel().writeAndFlush(heartBeatMsg);
         } else if (IdleStateEvent.FIRST_READER_IDLE_STATE_EVENT == evt) {
-//            log.warn("channel first read timeout {}", ctx.channel());
-//            ctx.channel().close();
+            log.warn("channel first read timeout {}", ctx.channel());
+            ctx.channel().close();
         }
         super.channelIdle(ctx, evt);
     }

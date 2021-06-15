@@ -15,7 +15,7 @@ import java.util.List;
 public class Consumer extends TemplateConsumer {
 
     @Override
-    @MqSubScribe(keys = "k1")
+//    @MqSubScribe(keys = "k1")
     public void consumeWithAutoAck(List<MqMessage> msgs) {
         for (MqMessage msg : msgs) {
             System.out.println(msg);

@@ -39,10 +39,6 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
         log.info("receive mqSubMsg from client: {}, msg: {}", msg.getClientId(), msg);
         byte type = msg.getType();
         switch (type) {
-            case Constants.TYPE_HEARTBEAT: {
-                handleHeartbeatMessage(ctx);
-                break;
-            }
             case MqSubMessage.TYPE_SUBSCRIBE: {
                 registerSubClient(ctx, msg);
                 break;
@@ -85,12 +81,6 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
         ctx.close();
     }
 
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        log.info("userEventTriggered ctx: {}, evt: {}",ctx,evt);
-        super.userEventTriggered(ctx, evt);
-    }
-
     private void registerSubClient(ChannelHandlerContext ctx, MqSubMessage msg) {
 
         SubClientInfo subClientInfo = new SubClientInfo(msg.getClientId(), msg.getClientWeight(), ctx);
@@ -129,10 +119,4 @@ public class MqSubMessageHandler extends SimpleChannelInboundHandler<MqSubMessag
         }
     }
 
-    private void handleHeartbeatMessage(ChannelHandlerContext ctx) {
-        MqSubMessage mqSubMessage = new MqSubMessage();
-        mqSubMessage.setType(Constants.TYPE_HEARTBEAT);
-        log.debug("response heartbeat message {}", ctx.channel());
-        ctx.channel().writeAndFlush(mqSubMessage);
-    }
 }
